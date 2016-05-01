@@ -1,0 +1,92 @@
+.nav-tabs > li {
+	font-size: 16px;
+}
+
+
+body {
+  padding-top: 40px;
+  padding-bottom: 40px;
+  padding-right: 10px;
+  background-image: url('../images/dish1.jpg');
+  background-repeat:no-repeat;
+
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin {
+  margin-bottom: 10px;
+
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+   margin-top: 10px;
+  margin-bottom: 10px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+
+
+.form-signin .form-label {
+  position: relative;
+  height: auto;
+  padding: 10px;
+  font-size: 19px;
+  color: white;
+  font-style: bold;
+    font-family: 'Open Sans', sans-serif;
+
+}
+
+.form-signin .hidden {
+    display: none;
+}
+.form-signin .buttonSpace {
+    margin-left: 10px;
+    font-weight: 25px
+}
+.form-signin .select {
+    padding: 10px 143px 10px 10px;
+    border: 1px solid #979997;
+    color: grey;
+    font-size: 16px;
+   margin-top: 10px;
+  margin-bottom: 10px;
+  position: relative;
+  height: auto;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    -o-appearance: none;
+    appearance: none;
+  
+}
+.form-signin .heading
+{
+      font-size:50px;
+      font-style: bold;
+      margin-bottom: 30px;
+      color: #396a93;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 900;
+;
+    
+}
+.arrow {
+    font-size:2px;
+    line-height:0%;
+
+}
