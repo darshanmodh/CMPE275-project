@@ -1,15 +1,23 @@
-
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+     <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <!DOCTYPE HTML>
+<html>
 <title>Order Management System</title>
 <head>
 	<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<link href="assets/css/bootstrap.min.css" rel="stylesheet">
-	<link href="assets/css/style2.css" rel="stylesheet">
-	  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet'  type='text/css'>
-<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+    
+    <spring:url value="/resources/assets/css/bootstrap.min.css" var="mainCss" />
+	<link href="${mainCss}" rel="stylesheet">
+	
+	<spring:url value="/resources/assets/css/style2.css" var="styleCss"/>
+	<link href="${styleCss}" rel="stylesheet">
+	
+
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+
 <script type="text/javascript">
 $(document).ready(function(){
           console.log("start");
@@ -65,7 +73,7 @@ function readURL(input) {
 					<input type="file" accept="image/*" class="buttonSpace" onchange="readURL(this);" style="margin-bottom: 5px" required="true" />
     				<img id="picture" src="#" alt="your image" />
     				
-					<select required class="select" >
+					<select required class="form-control">
     				  <option value="" selected="selected" disabled="disabled">Select a category <span class="arrow">&#9661;</span></option>
     				  <option value="appetizer">Appetizer</option>
 					  <option value="mainCourse">Main Course</option>
