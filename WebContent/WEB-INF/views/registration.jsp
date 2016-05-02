@@ -38,19 +38,15 @@
 		</ul>
 		<div class="tab-content">
 			<div id="Register" class="tab-pane fade in active">
-				<form class="form-signin">
-					<input id="inputEmail" class="form-control" type="email" placeholder="Email address" maxlength="50" required autofocus>
-					<input id ="inputPassword" class="form-control" type="password" placeholder="Password" maxlength="10" minlength="6" required >
-					<input id="confirmPassword" class="form-control" type="password" placeholder="Confirm Password" required>
+				<form class="form-signin" method="post">
+					<input id="inputEmail" name="email" class="form-control" type="email" placeholder="Email address" maxlength="50" required autofocus>
+					<input id ="inputPassword" name="password" class="form-control" type="password" placeholder="Password" maxlength="10" minlength="6" required >
+					<input id="confirmPassword" name="cpassword" class="form-control" type="password" placeholder="Confirm Password" required>
 					<button type="submit" class="btn btn-lg btn-primary btn-block">Register</button>
 				</form>
 			</div>
-			<div id="Login" class="tab-pane fade">
-				<form class="form-signin">
-					<input id="inputEmail" class="form-control" type="email" placeholder="Email address" maxlength="50" required autofocus>
-					<input id ="inputPassword" class="form-control" type="password" placeholder="Password" maxlength="10" minlength="6" required >
-					<button type="submit" class="btn btn-lg btn-primary btn-block">Login</button>
-				</form>
+			<div id="message">
+				<h3> ${message} </h3> 
 			</div>
 		</div>
 	</div>
