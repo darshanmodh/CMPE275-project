@@ -5,7 +5,6 @@ import java.security.SecureRandom;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,7 +31,6 @@ public class UserController {
 			SecureRandom random = new SecureRandom();
 			String verificationCode = new BigInteger(50, random).toString(32);
 			System.out.println("Verification code: " + verificationCode);
-			System.out.println("Length : "+verificationCode.length());
 			User user = new User();
 			user.setEmail(email);
 			user.setPassword(password);
@@ -52,12 +50,34 @@ public class UserController {
 	}	
 	
 	@RequestMapping(value="/login",method=RequestMethod.GET)
-	public String loginPage() {		
+	public String loginPage() {
 		return "login";
 	}
 	
 	@RequestMapping(value="/login",method=RequestMethod.POST)
-	public String loginUser() {		
-		return "customer";
+	public String loginUser(@RequestParam("inputEmail") String email,
+			@RequestParam("inputPassword") String password, ModelMap model) {
+		DatabaseService databaseService = new DatabaseService();
+		String dbPassword = databaseService.getPassword(email);
+		if(password.equals(dbPassword)) {
+			boolean isVerified = databaseService.isVerified(email);
+			if(isVerified) {
+				model.addAttribute("email", email);
+				return "customer";
+			} else {
+				// complete verification process
+				model.addAttribute("email", email);
+				return "verification";
+			}
+		} else {
+			// wrong password
+			model.addAttribute("message", "Wrong email address or password.");
+			return "login";
+		}
+	}
+	
+	@RequestMapping(value="/verification",method=RequestMethod.POST)
+	public void verifyUser() {
+		System.out.println("You reached verification process");
 	}
 }

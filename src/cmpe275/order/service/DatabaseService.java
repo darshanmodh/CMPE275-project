@@ -43,4 +43,32 @@ public class DatabaseService {
 		}
 		return verificationCode;
 	}
+	
+	public String getPassword(String emailId) {
+		String password = "";
+		Query query = entityManager.createQuery("select u from User u where u.email=:emailId");
+		query.setParameter("emailId", emailId);
+		try {
+			User user = (User) query.getSingleResult();
+			password = user.getPassword();
+		} catch (Exception e) {
+			System.out.println("Exception : getPassword()");
+			e.printStackTrace();
+		}
+		return password;
+	}
+	
+	public boolean isVerified(String emailId) {
+		boolean isVerified = false;
+		Query query = entityManager.createQuery("select u from User u where u.email=:emailId");
+		query.setParameter("emailId", emailId);
+		try {
+			User user = (User) query.getSingleResult();
+			isVerified = user.isVerified();
+		} catch (Exception e) {
+			System.out.println("Exception : isVerified()");
+			e.printStackTrace();
+		}
+		return isVerified;
+	}
 }
