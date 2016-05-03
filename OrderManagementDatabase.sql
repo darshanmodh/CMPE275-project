@@ -42,5 +42,14 @@ CREATE TABLE OrderDetail (
         REFERENCES FoodOrder (orderId)
 );
 
+CREATE TABLE OrdersPlaced (
+  chefId int(11) NOT NULL,
+  prepDate date NOT NULL,
+  startTime time NOT NULL,
+  endTime time DEFAULT NULL,
+  orderId int(11) DEFAULT NULL,
+  PRIMARY KEY (chefId,prepDate,startTime)
+);
+
 insert into User values('admin@admin.com','admin','A','0000',true);
 					
