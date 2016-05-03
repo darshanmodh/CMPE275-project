@@ -71,4 +71,35 @@ public class DatabaseService {
 		}
 		return isVerified;
 	}
+	
+	public boolean makeUserVerified(String emailId) {
+		boolean verifyComplete = false;
+		entityManager.getTransaction().begin();
+		Query query = entityManager.createQuery("update User u SET u.isVerified = '" + true + "' WHERE u.email=:emailId");
+		query.setParameter("emailId", emailId);
+		try {
+			query.executeUpdate();
+			verifyComplete = true;
+		} catch (Exception e) {
+			System.out.println("Exception : makeUserVerified()");
+			return false;
+		}
+		entityManager.getTransaction().commit();
+		return verifyComplete;
+	}
+	
+	public char isAdmin(String emailId) {
+		char isAdmin = '\0';
+		Query query = entityManager.createQuery("select u from User u where u.email=:emailId");
+		query.setParameter("emailId", emailId);
+		try {
+			User user = (User) query.getSingleResult();
+			isAdmin = user.getRole();
+		} catch (Exception e) {
+			System.out.println("Exception : isVerified()");
+			e.printStackTrace();
+		}
+		return isAdmin;
+	}
+	
 }

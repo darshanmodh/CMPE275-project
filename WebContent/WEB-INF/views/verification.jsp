@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <!doctype html>
 <html>
@@ -27,8 +26,7 @@
 		<div class="tab-content">
 
 			<div id="Login" class="tab-pane fade">
-			<c:url var="addAction" value="/user/verification" ></c:url>
-				<form class="form-signin" method="post" action="${addAction}">
+				<form class="form-signin" method="post" action="verification">
 					<input id="inputEmail" name="inputEmail" class="form-control"
 						type="email" placeholder="Email address" maxlength="50" value=${email}  required
 						autofocus /> <input id="inputVerificationCode" name="inputVerificationCode"
@@ -39,6 +37,7 @@
 			</div>
 			<div id="message">
 				<p>Please input verification code sent to your email address.</p>
+				<p>${message}</p>
 			</div>
 		</div>
 	</div>

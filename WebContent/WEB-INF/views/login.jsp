@@ -29,7 +29,7 @@
 						type="email" placeholder="Email address" maxlength="50" required
 						autofocus /> <input id="inputPassword" name="inputPassword"
 						class="form-control" type="password" placeholder="Password"
-						maxlength="10" minlength="6" required>
+						maxlength="10" minlength="4" required>
 					<button type="submit" class="btn btn-lg btn-primary btn-block">Login</button>
 				</form>
 			</div>

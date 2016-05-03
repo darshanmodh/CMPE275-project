@@ -62,8 +62,18 @@ public class UserController {
 		if(password.equals(dbPassword)) {
 			boolean isVerified = databaseService.isVerified(email);
 			if(isVerified) {
-				model.addAttribute("email", email);
-				return "customer";
+				// check admin or customer
+				char isAdmin = '\0';
+				isAdmin = databaseService.isAdmin(email);
+				if(isAdmin == 'A') {
+					model.addAttribute("email", email);
+					return "admin";
+				} else if(isAdmin == 'U') {
+					model.addAttribute("email", email);
+					return "customer";
+				} else {
+					return "login";
+				}
 			} else {
 				// complete verification process
 				model.addAttribute("email", email);
@@ -76,8 +86,37 @@ public class UserController {
 		}
 	}
 	
+	@RequestMapping(value="/verification",method=RequestMethod.GET)
+	public String getVerify() {
+		System.out.println("Get Request on Verification");
+		return "login";
+	}
+	
 	@RequestMapping(value="/verification",method=RequestMethod.POST)
-	public void verifyUser() {
+	public String verifyUser(@RequestParam("inputEmail") String email,
+			@RequestParam("inputVerificationCode") String verficationCode, ModelMap model) {
 		System.out.println("You reached verification process");
+		String dbVerificationCode = "";
+		boolean isVerified = false;
+		DatabaseService databaseService = new DatabaseService();
+		dbVerificationCode = databaseService.getVerificationCode(email);
+		if(verficationCode.equals(dbVerificationCode)) {
+			// update isVerify in DB
+			isVerified = databaseService.makeUserVerified(email);
+			if(isVerified) {
+				model.addAttribute("email", email);
+				model.addAttribute("message", "Your verification is successfully completed.");
+				return "customer";
+			} else {
+				// error while updating
+				model.addAttribute("message", "Verification failed, please try again.");
+				return "verification";
+			}
+		} else {
+			// wrong verification code
+			model.addAttribute("email", email);
+			model.addAttribute("message", "Wrong verification code!!!");
+			return "verification";
+		}
 	}
 }
