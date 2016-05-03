@@ -7,6 +7,7 @@ import javax.sql.rowset.serial.SerialException;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,7 +47,13 @@ public class OrderController {
 		}
 		
 	}
-
+	@RequestMapping(value="/items/delete/{id}", method=RequestMethod.DELETE)
+	public void deleteItem(@PathVariable("id") int id)
+	{
+		System.out.println("Deleting");
+		DatabaseService ds=new DatabaseService();
+		ds.deleteItem(id);
+	}
 	public DatabaseService getDatabaseService() {
 		return databaseService;
 	}
