@@ -4,7 +4,7 @@
 	     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
    
       <class>cmpe275.order.model.MenuItem</class>
-      <class>cmpe275.user.model.User</class>
+      <class>cmpe275.order.model.User</class>
       <exclude-unlisted-classes>false</exclude-unlisted-classes> 
 
       <properties>

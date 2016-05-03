@@ -1,4 +1,4 @@
-package cmpe275.user.controller;
+package cmpe275.order.controller;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -9,20 +9,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import cmpe275.order.model.User;
 import cmpe275.order.service.DatabaseService;
 import cmpe275.order.service.MailService;
-import cmpe275.user.model.User;
 
 @Controller
-@RequestMapping("/user")
 public class UserController {
 	
-	@RequestMapping(value="/",method=RequestMethod.GET)
+	@RequestMapping(value="/user",method=RequestMethod.GET)
 	public String getDefault() {
 		return "registration";
 	}
 	
-	@RequestMapping(value="/",method=RequestMethod.POST)
+	@RequestMapping(value="/user/register",method=RequestMethod.POST)
 	public String addUser(@RequestParam("email") String email,
 							@RequestParam("password") String password,
 							@RequestParam("cpassword") String cpassword, ModelMap model) {
@@ -42,19 +41,19 @@ public class UserController {
 			MailService mailService = new MailService();
 			mailService.sendMail(user.getEmail());
 			model.addAttribute("message", "User added to DB");
-			return "registration";
+			return "verification";
 		} else {
 			model.addAttribute("message", "Password and confirm password are not matched!!!");
 			return "registration";
 		}
 	}	
 	
-	@RequestMapping(value="/login",method=RequestMethod.GET)
+	@RequestMapping(value="/user/login",method=RequestMethod.GET)
 	public String loginPage() {
-		return "login";
+		return "registration";
 	}
 	
-	@RequestMapping(value="/login",method=RequestMethod.POST)
+	@RequestMapping(value="/user/login",method=RequestMethod.POST)
 	public String loginUser(@RequestParam("inputEmail") String email,
 			@RequestParam("inputPassword") String password, ModelMap model) {
 		DatabaseService databaseService = new DatabaseService();
@@ -72,7 +71,7 @@ public class UserController {
 					model.addAttribute("email", email);
 					return "customer";
 				} else {
-					return "login";
+					return "registration";
 				}
 			} else {
 				// complete verification process
@@ -82,17 +81,17 @@ public class UserController {
 		} else {
 			// wrong password
 			model.addAttribute("message", "Wrong email address or password.");
-			return "login";
+			return "registration";
 		}
 	}
 	
-	@RequestMapping(value="/verification",method=RequestMethod.GET)
+	@RequestMapping(value="/user/verification",method=RequestMethod.GET)
 	public String getVerify() {
 		System.out.println("Get Request on Verification");
-		return "login";
+		return "verification";
 	}
 	
-	@RequestMapping(value="/verification",method=RequestMethod.POST)
+	@RequestMapping(value="/user/verification",method=RequestMethod.POST)
 	public String verifyUser(@RequestParam("inputEmail") String email,
 			@RequestParam("inputVerificationCode") String verficationCode, ModelMap model) {
 		System.out.println("You reached verification process");

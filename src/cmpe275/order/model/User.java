@@ -1,4 +1,4 @@
-package cmpe275.user.model;
+package cmpe275.order.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

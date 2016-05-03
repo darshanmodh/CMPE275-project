@@ -6,7 +6,7 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 import cmpe275.order.model.MenuItem;
-import cmpe275.user.model.User;
+import cmpe275.order.model.User;
 
 public class DatabaseService {
 

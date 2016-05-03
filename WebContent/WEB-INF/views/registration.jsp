@@ -9,11 +9,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
   
-	<link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <spring:url value="/resources/assets/css/bootstrap.min.css" var="mainCss" />
+	<link href="${mainCss}" rel="stylesheet">
 	
-	<link href="assets/css/style.css" rel="stylesheet">
+	<spring:url value="/resources/assets/css/style.css" var="styleCss"/>
+	<link href="${styleCss}" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-	<script src="assets/js/bootstrap.min.js" type="text/javascript">
+	<spring:url value="/resources/assets/js/bootstrap.min.js" var="mainJs"/>
+	<script src="${mainJs}"></script>
 	<script type="text/javascript">
 		window.onload = function () {
 			document.getElementById("inputPassword").onchange = validatePassword;
@@ -37,16 +40,24 @@
 			<li><a data-toggle="tab" href="#Login">Login</a></li>
 		</ul>
 		<div class="tab-content">
-			<div id="Register" class="tab-pane fade in active">
-				<form class="form-signin" method="post">
+			<div id="Register" class="tab-pane fade in active" >
+				<form class="form-signin" method="post" action="/cmpe275/user/register">
 					<input id="inputEmail" name="email" class="form-control" type="email" placeholder="Email address" maxlength="50" required autofocus>
 					<input id ="inputPassword" name="password" class="form-control" type="password" placeholder="Password" maxlength="10" minlength="6" required >
 					<input id="confirmPassword" name="cpassword" class="form-control" type="password" placeholder="Confirm Password" required>
 					<button type="submit" class="btn btn-lg btn-primary btn-block">Register</button>
 				</form>
 			</div>
-			<div id="message">
-				<h3> ${message} </h3> 
+			<div id="Login" class="tab-pane fade">
+				<form class="form-signin" method="post" action="/cmpe275/user/login">
+					<input id="inputEmail" name="inputEmail" class="form-control"
+						type="email" placeholder="Email address" maxlength="50" required
+						autofocus /> 
+						<input id="inputPassword" name="inputPassword"
+						class="form-control" type="password" placeholder="Password"
+						maxlength="10" minlength="4" required>
+					<button type="submit" class="btn btn-lg btn-primary btn-block">Login</button>
+				</form>
 			</div>
 		</div>
 	</div>
