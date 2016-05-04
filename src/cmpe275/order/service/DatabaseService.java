@@ -1,9 +1,17 @@
 package cmpe275.order.service;
 
+import java.sql.Blob;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialException;
 
 import cmpe275.order.model.MenuItem;
 import cmpe275.order.model.User;
@@ -33,7 +41,36 @@ public class DatabaseService {
 		entityManager.close();
 		entityManagerFactory.close();
 	}
+	
+	public List<MenuItem> viewAllItems() {
+		Query query = entityManager.createQuery("select m.menuId,m.name,m.category from MenuItem m");
+		@SuppressWarnings("unchecked")
+		List<Object[]> menu =  query.getResultList();
+		List<MenuItem> menuList = new ArrayList<MenuItem>();
+		for (Object[] m: menu) {
+			MenuItem mi = new MenuItem();
+			mi.setMenuId((int) m[0]);
+			mi.setName((String) m[1]);
+			mi.setCategory((String) m[2]);
+			menuList.add(mi);
+		}
+		//System.out.println(menuList.get(0).getName());
+		return menuList;
+	}
+	
+	public MenuItem viewItem(int menuId) {
+		Query query = entityManager.createQuery("select m from MenuItem m where m.menuId="+menuId+"");
+		MenuItem menu = (MenuItem) query.getSingleResult();
+		return menu;
+	}
 
+	public Blob getImage(int menuId) throws SerialException, SQLException {
+		Query query = entityManager.createQuery("select m.picture from MenuItem m where m.menuId="+menuId+"");
+		MenuItem menu = new MenuItem();
+		menu.setPicture(new SerialBlob((byte[]) query.getSingleResult()));
+		return menu.getPicture();
+	}
+	
 	public void addUser(User user) {
 		entityManager.getTransaction().begin();
 		entityManager.persist(user);
