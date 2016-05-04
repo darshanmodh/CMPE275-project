@@ -34,8 +34,12 @@ public class OrderController {
 		return "additem";
 	}
 	
+	@RequestMapping(value="/items/add", method=RequestMethod.GET)
+	public String getItemPage() {
+		return "additem";
+	}
 	@RequestMapping(value="/items/add", method=RequestMethod.POST)
-	public void addItem(@RequestParam("category") String category,
+	public String addItem(@RequestParam("category") String category,
 						  @RequestParam("name") String name, 
 						  @RequestParam("picture") String picture,
 						  @RequestParam("unitPrice") float unitPrice,
@@ -54,7 +58,10 @@ public class OrderController {
 			byte[] decodedBytes = Base64.decodeBase64(picture);
 			menu.setPicture(new SerialBlob(decodedBytes));
 		}
+		DatabaseService database = new DatabaseService();
+		database.addItem(menu);
 		
+		return "additem";
 	}
 	@RequestMapping(value="/items/delete/{id}", method=RequestMethod.DELETE)
 	public void deleteItem(@PathVariable("id") int id)
