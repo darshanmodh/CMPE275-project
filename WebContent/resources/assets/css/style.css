@@ -55,9 +55,15 @@ body {
 	float: right;
 }
 
-.icon {
-	width: 50px;
-	height: 50px
+.thumbnail {
+	width: 350px;
+	height: 350px;
+	display:block;
+}
+
+.thumbnail>a>img {
+	height: 200px;
+	width:300px;
 }
 .list {
 	height: 120px;	

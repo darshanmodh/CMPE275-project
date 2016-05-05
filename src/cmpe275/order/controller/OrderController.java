@@ -63,12 +63,12 @@ public class OrderController {
 		
 		return "additem";
 	}
-	@RequestMapping(value="/items/delete/{id}", method=RequestMethod.DELETE)
-	public void deleteItem(@PathVariable("id") int id)
+	@RequestMapping(value="/items/delete/{id}", method=RequestMethod.POST)
+	public String deleteItem(@PathVariable("id") int id)
 	{
-		System.out.println("Deleting");
 		DatabaseService ds=new DatabaseService();
 		ds.deleteItem(id);
+		return "redirect:/items/viewall";
 	}
 	
 	@RequestMapping(value="/items/viewall", method=RequestMethod.GET)

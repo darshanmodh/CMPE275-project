@@ -35,15 +35,15 @@ public class DatabaseService {
 	public void deleteItem(int id) {
 		// May be needs to be changed for handling already placed order
 		entityManager.getTransaction().begin();
-		MenuItem mi = entityManager.find(MenuItem.class, id);
-		entityManager.remove(mi);
+		Query query = entityManager.createQuery("update MenuItem m set m.isEnabled=0 where m.menuId="+id+"");
+		query.executeUpdate();
 		entityManager.getTransaction().commit();
 		entityManager.close();
 		entityManagerFactory.close();
 	}
 	
 	public List<MenuItem> viewAllItems() {
-		Query query = entityManager.createQuery("select m.menuId,m.name,m.category from MenuItem m");
+		Query query = entityManager.createQuery("select m.menuId,m.name,m.category from MenuItem m where m.isEnabled=1");
 		@SuppressWarnings("unchecked")
 		List<Object[]> menu =  query.getResultList();
 		List<MenuItem> menuList = new ArrayList<MenuItem>();
