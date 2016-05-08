@@ -68,3 +68,11 @@ body {
 .list {
 	height: 120px;	
 }
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width:100
+}
