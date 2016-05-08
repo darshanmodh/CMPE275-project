@@ -13,7 +13,7 @@ CREATE TABLE MenuItem (
     menuId INT PRIMARY KEY AUTO_INCREMENT,
     category VARCHAR(20),
     name VARCHAR(50),
-    picture BLOB,
+    picture LONGBLOB,
     unitPrice FLOAT,
     calories FLOAT,
     prepTime INT,
