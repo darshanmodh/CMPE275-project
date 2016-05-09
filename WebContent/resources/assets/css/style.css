@@ -68,6 +68,13 @@ body {
 .list {
 	height: 120px;	
 }
+.whiteTextOverride
+{
+ color: white !important;
+ margin: 10px;
+ padding: 10px;
+}
+
 
 html,
 body {
