@@ -58,6 +58,9 @@
 	       <span class="glyphicon glyphicon-plus-sign"></span> Add to Cart 
 	       </button>
        </c:if>
+        <button class="btn btn-danger" role="button"> 
+       <span class="glyphicon glyphicon-plus-sign"></span> Add to Cart 
+       </button>
     </div>
   </div>
     </c:forEach>
