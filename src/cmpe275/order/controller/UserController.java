@@ -1,8 +1,16 @@
 package cmpe275.order.controller;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,18 +23,25 @@ import cmpe275.order.service.MailService;
 
 @Controller
 public class UserController {
-	
-	@RequestMapping(value="/user",method=RequestMethod.GET)
-	public String getDefault() {
+
+	@RequestMapping(value = "/user", method = RequestMethod.GET)
+	public String getDefault(HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession(false);
+			if (session.getAttribute("user") != null) {
+				return "customer";
+			}
+		} catch (NullPointerException e) {
+			System.out.println("NullPointerException - No session available");
+		}
 		return "registration";
 	}
-	
-	@RequestMapping(value="/user/register",method=RequestMethod.POST)
-	public String addUser(@RequestParam("email") String email,
-							@RequestParam("password") String password,
-							@RequestParam("cpassword") String cpassword, ModelMap model) {
+
+	@RequestMapping(value = "/user/register", method = RequestMethod.POST)
+	public String addUser(@RequestParam("email") String email, @RequestParam("password") String password,
+			@RequestParam("cpassword") String cpassword, ModelMap model) {
 		System.out.println("IN USER REGISTRATION");
-		if(password.equals(cpassword)) {
+		if (password.equals(cpassword)) {
 			SecureRandom random = new SecureRandom();
 			String verificationCode = new BigInteger(50, random).toString(32);
 			System.out.println("Verification code: " + verificationCode);
@@ -46,29 +61,42 @@ public class UserController {
 			model.addAttribute("message", "Password and confirm password are not matched!!!");
 			return "registration";
 		}
-	}	
-	
-	@RequestMapping(value="/user/login",method=RequestMethod.GET)
-	public String loginPage() {
+	}
+
+	@RequestMapping(value = "/user/login", method = RequestMethod.GET)
+	public String loginPage(HttpServletRequest request) {
+		try {
+			HttpSession session = request.getSession(false);
+			if (session.getAttribute("user") != null) {
+				return "customer";
+			}
+		} catch (NullPointerException e) {
+			System.out.println("NullPointerException - No session available");
+		}
 		return "registration";
 	}
-	
-	@RequestMapping(value="/user/login",method=RequestMethod.POST)
-	public String loginUser(@RequestParam("inputEmail") String email,
-			@RequestParam("inputPassword") String password, ModelMap model) {
+
+	@RequestMapping(value = "/user/login", method = RequestMethod.POST)
+	public String loginUser(@RequestParam("inputEmail") String email, @RequestParam("inputPassword") String password,
+			ModelMap model, HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		DatabaseService databaseService = new DatabaseService();
 		String dbPassword = databaseService.getPassword(email);
-		if(password.equals(dbPassword)) {
+		if (password.equals(dbPassword)) {
 			boolean isVerified = databaseService.isVerified(email);
-			if(isVerified) {
+			if (isVerified) {
+				HttpSession session = request.getSession();
+				session.setAttribute("user", email);
+				session.setMaxInactiveInterval(30 * 60); // 30min
+				Cookie userName = new Cookie("user", email);
+				userName.setMaxAge(30 * 60);
+				response.addCookie(userName);
 				// check admin or customer
 				char isAdmin = '\0';
 				isAdmin = databaseService.isAdmin(email);
-				if(isAdmin == 'A') {
-					model.addAttribute("email", email);
+				if (isAdmin == 'A') {
 					return "admin";
-				} else if(isAdmin == 'U') {
-					model.addAttribute("email", email);
+				} else if (isAdmin == 'U') {
 					return "customer";
 				} else {
 					return "registration";
@@ -84,14 +112,14 @@ public class UserController {
 			return "registration";
 		}
 	}
-	
-	@RequestMapping(value="/user/verification",method=RequestMethod.GET)
+
+	@RequestMapping(value = "/user/verification", method = RequestMethod.GET)
 	public String getVerify() {
 		System.out.println("Get Request on Verification");
 		return "verification";
 	}
-	
-	@RequestMapping(value="/user/verification",method=RequestMethod.POST)
+
+	@RequestMapping(value = "/user/verification", method = RequestMethod.POST)
 	public String verifyUser(@RequestParam("inputEmail") String email,
 			@RequestParam("inputVerificationCode") String verficationCode, ModelMap model) {
 		System.out.println("You reached verification process");
@@ -99,10 +127,10 @@ public class UserController {
 		boolean isVerified = false;
 		DatabaseService databaseService = new DatabaseService();
 		dbVerificationCode = databaseService.getVerificationCode(email);
-		if(verficationCode.equals(dbVerificationCode)) {
+		if (verficationCode.equals(dbVerificationCode)) {
 			// update isVerify in DB
 			isVerified = databaseService.makeUserVerified(email);
-			if(isVerified) {
+			if (isVerified) {
 				model.addAttribute("email", email);
 				model.addAttribute("message", "Your verification is successfully completed.");
 				return "customer";
@@ -117,5 +145,26 @@ public class UserController {
 			model.addAttribute("message", "Wrong verification code!!!");
 			return "verification";
 		}
+	}
+
+	@RequestMapping(value = "/user/logout", method = RequestMethod.GET)
+	public String getLogoutUser(HttpServletRequest request, ModelMap model) {
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals("user")) {
+					System.out.println("USER COOKIE = " + cookie.getValue());
+					cookie.setMaxAge(0);
+					System.out.println("Cookie of user is deleted");
+				}
+			}
+		}
+
+		HttpSession session = request.getSession(false);
+		System.out.println("User session = " + session.getAttribute("user"));
+		if (session != null) {
+			session.invalidate();
+		}
+		return "registration";
 	}
 }
