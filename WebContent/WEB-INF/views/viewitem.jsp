@@ -29,6 +29,7 @@
   </div>
 </nav>
 <div class="row">
+<c:set var="isDisabled" value="${isDisabled}"/>
   <c:forEach items="${list}" var="menu">
   <div class="col-lg-4">
   <div class="thumbnail">
@@ -39,11 +40,24 @@
     		<h3>${menu.name}</h3>
     		<h4>${menu.category}</h4>
        </div>
-       <form method="post" action="/cmpe275/items/delete/${menu.menuId}">
-       <button class="btn btn-danger" role="button"> 
-       <span class="glyphicon glyphicon-remove"></span> Remove 
+       
+       <c:if test="${isDisabled==1}">
+	       <form method="post" action="/cmpe275/items/enable/${menu.menuId}">
+	       <button class="btn btn-danger" role="button"> 
+	       <span class="glyphicon glyphicon-ok"></span> Enable 
        </button>
        </form>
+       </c:if>
+       <c:if test="${isDisabled== 0}">
+	       <form method="post" action="/cmpe275/items/delete/${menu.menuId}">
+	       <button class="btn btn-danger" role="button"> 
+	       <span class="glyphicon glyphicon-remove"></span> Remove 
+	       </button>
+	       </form>
+	        <button class="btn btn-danger" role="button"> 
+	       <span class="glyphicon glyphicon-plus-sign"></span> Add to Cart 
+	       </button>
+       </c:if>
         <button class="btn btn-danger" role="button"> 
        <span class="glyphicon glyphicon-plus-sign"></span> Add to Cart 
        </button>

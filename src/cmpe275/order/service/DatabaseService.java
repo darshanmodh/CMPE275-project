@@ -42,8 +42,34 @@ public class DatabaseService {
 		entityManagerFactory.close();
 	}
 	
+	public void enableItem(int id) {
+		// May be needs to be changed for handling already placed order
+		entityManager.getTransaction().begin();
+		Query query = entityManager.createQuery("update MenuItem m set m.isEnabled=1 where m.menuId="+id+"");
+		query.executeUpdate();
+		entityManager.getTransaction().commit();
+		entityManager.close();
+		entityManagerFactory.close();
+	}
+	
 	public List<MenuItem> viewAllItems() {
 		Query query = entityManager.createQuery("select m.menuId,m.name,m.category from MenuItem m where m.isEnabled=1");
+		@SuppressWarnings("unchecked")
+		List<Object[]> menu =  query.getResultList();
+		List<MenuItem> menuList = new ArrayList<MenuItem>();
+		for (Object[] m: menu) {
+			MenuItem mi = new MenuItem();
+			mi.setMenuId((int) m[0]);
+			mi.setName((String) m[1]);
+			mi.setCategory((String) m[2]);
+			menuList.add(mi);
+		}
+		//System.out.println(menuList.get(0).getName());
+		return menuList;
+	}
+	
+	public List<MenuItem> viewDisabledItems() {
+		Query query = entityManager.createQuery("select m.menuId,m.name,m.category from MenuItem m where m.isEnabled=0");
 		@SuppressWarnings("unchecked")
 		List<Object[]> menu =  query.getResultList();
 		List<MenuItem> menuList = new ArrayList<MenuItem>();
