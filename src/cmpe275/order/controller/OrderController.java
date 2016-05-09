@@ -11,14 +11,11 @@ import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
 
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import cmpe275.order.model.MenuItem;
@@ -71,16 +68,36 @@ public class OrderController {
 		return "redirect:/items/viewall";
 	}
 	
+	@RequestMapping(value="/items/enable/{id}", method=RequestMethod.POST)
+	public String enableItem(@PathVariable("id") int id) {
+		DatabaseService ds=new DatabaseService();
+		ds.enableItem(id);
+		return "redirect:/items/viewdisabled";
+	}
+	
 	@RequestMapping(value="/items/viewall", method=RequestMethod.GET)
 	public ModelAndView viewItems() {
 		ModelAndView mav = new ModelAndView();
 		DatabaseService database = new DatabaseService();
 		List<MenuItem> menuItems = database.viewAllItems();
 		mav.addObject("list",menuItems);
+		mav.addObject("isDisabled", 0);
 		mav.setViewName("viewitem");
 		return mav;
 		
 	}
+	
+	@RequestMapping(value="/items/viewdisabled",method=RequestMethod.GET)
+	public ModelAndView viewDisabledItems() {
+		ModelAndView mav = new ModelAndView();
+		DatabaseService database = new DatabaseService();
+		List<MenuItem> menuItems = database.viewDisabledItems();
+		mav.addObject("list",menuItems);
+		mav.addObject("isDisabled", 1);
+		mav.setViewName("viewitem");
+		return mav;
+	}
+	
 	@RequestMapping(value="/items/{itemId}",method=RequestMethod.GET) 
 	public ModelAndView viewItem(@PathVariable("itemId") int menuId){
 		ModelAndView mav = new ModelAndView();

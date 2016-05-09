@@ -76,5 +76,53 @@
 		</c:forEach>
 	</div>
 
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">OrderNow</a>
+    </div>
+    <button type="button" class="btn btn-info btn-lg pull-right">
+          <span class="glyphicon glyphicon-shopping-cart"></span> Shopping Cart
+        </button>
+  </div>
+</nav>
+<div class="row">
+<c:set var="isDisabled" value="${isDisabled}"/>
+  <c:forEach items="${list}" var="menu">
+  <div class="col-lg-4">
+  <div class="thumbnail">
+    <a  href="/cmpe275/items/${menu.menuId}">
+      <img class="img-rounded" src="/cmpe275/items/${menu.menuId}/picture"></img>
+    </a>
+       <div class="caption">
+    		<h3>${menu.name}</h3>
+    		<h4>${menu.category}</h4>
+       </div>
+       
+       <c:if test="${isDisabled==1}">
+	       <form method="post" action="/cmpe275/items/enable/${menu.menuId}">
+	       <button class="btn btn-danger" role="button"> 
+	       <span class="glyphicon glyphicon-ok"></span> Enable 
+       </button>
+       </form>
+       </c:if>
+       <c:if test="${isDisabled== 0}">
+	       <form method="post" action="/cmpe275/items/delete/${menu.menuId}">
+	       <button class="btn btn-danger" role="button"> 
+	       <span class="glyphicon glyphicon-remove"></span> Remove 
+	       </button>
+	       </form>
+	        <button class="btn btn-danger" role="button"> 
+	       <span class="glyphicon glyphicon-plus-sign"></span> Add to Cart 
+	       </button>
+       </c:if>
+        <button class="btn btn-danger" role="button"> 
+       <span class="glyphicon glyphicon-plus-sign"></span> Add to Cart 
+       </button>
+    </div>
+  </div>
+    </c:forEach>
+</div>
+
 </body>
 </html>
