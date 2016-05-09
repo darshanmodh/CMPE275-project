@@ -65,7 +65,7 @@ function readURL(input) {
 	<div class="container">
 
 		<form class="form-signin" method="post" action="/cmpe275/items/add">
-			<h2 class="heading">Enter Details</h2>
+			<h2 class="heading">Add Menu Item</h2>
 
 			<input id="name" class="form-control" type="text"
 				placeholder="Item Name" name="name" required autofocus> <label

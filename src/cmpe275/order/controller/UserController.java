@@ -95,8 +95,10 @@ public class UserController {
 				char isAdmin = '\0';
 				isAdmin = databaseService.isAdmin(email);
 				if (isAdmin == 'A') {
+					session.setAttribute("role", isAdmin);
 					return "admin";
 				} else if (isAdmin == 'U') {
+					session.setAttribute("role", isAdmin);
 					return "customer";
 				} else {
 					return "registration";
