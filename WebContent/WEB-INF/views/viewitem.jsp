@@ -81,6 +81,44 @@
     <div class="navbar-header">
       <a class="navbar-brand" href="#">OrderNow</a>
     </div>
+<div class="container">
+  
+  <!-- Trigger the modal with a button -->
+  
+  <form method="get" action="/cmpe275/items/getCartdetails">
+     
+ 
+  <button type="button" class="btn btn-info btn-lg pull-right" data-toggle="modal" data-target="#ShoppingCartModel">
+  
+  Shopping Cart</button>
+  
+  
+ 
+          
+  <!-- Modal -->
+  <div class="modal fade" id="ShoppingCartModel" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Shopping Cart </h4>
+        </div>
+        <div class="modal-body">
+        
+         
+        
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+   </form>
+</div>
     <button type="button" class="btn btn-info btn-lg pull-right">
           <span class="glyphicon glyphicon-shopping-cart"></span> Shopping Cart
         </button>

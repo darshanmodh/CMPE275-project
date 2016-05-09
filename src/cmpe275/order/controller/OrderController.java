@@ -3,6 +3,7 @@ package cmpe275.order.controller;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,13 +12,17 @@ import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
 
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpSession;
 import cmpe275.order.model.MenuItem;
 import cmpe275.order.service.DatabaseService;
 
@@ -26,6 +31,7 @@ public class OrderController {
 
 	private DatabaseService databaseService;
 	
+boolean sessionFlag;
 	@RequestMapping(value="/",method=RequestMethod.GET)
 	public String getDefault() {
 		return "additem";
@@ -68,6 +74,114 @@ public class OrderController {
 		return "redirect:/items/viewall";
 	}
 	
+
+    @RequestMapping(value="/items/getCartdetails", method=RequestMethod.GET)
+	
+	public ModelAndView getCartDetails(HttpServletRequest request)
+	{
+		HttpSession session = request.getSession();
+		
+		List<String[]> Cart = new ArrayList<String[]>();
+		
+		Cart = (List<String[]>)session.getAttribute("cart");
+		
+	        for (String[] m: Cart) {
+			
+			System.out.println(" ID  : "+m[0]);
+			
+			System.out.println(" Item Name : "+m[1]);
+			
+			System.out.println(" Quantity : "+m[2]);
+			
+		}	
+		
+	        ModelAndView mav = new ModelAndView();
+		
+			mav.addObject("shoppingCart",Cart);
+			mav.setViewName("viewitem");
+			return mav;   
+	        
+    //	DatabaseService ds=new DatabaseService();
+		
+	//	return "redirect:/items/viewall";
+		
+	}
+	
+	@RequestMapping(value="/items/shoppingCart", method=RequestMethod.POST)
+	
+	public String addToShoppingCart(@RequestParam("menuid") int menuid,
+			                        @RequestParam("menuName") String name, 
+			                        @RequestParam("quantity") int quantity,
+			                         HttpServletRequest request) 
+	{
+		// Get HTTPSession from the user 
+
+		HttpSession session = request.getSession(false);
+		
+		List<String[]> Cart = new ArrayList<String[]>();
+		
+		String[] menu = new String[3];
+		menu[0] = Integer.toString(menuid);
+		menu[1] = name;
+		menu[2] = Integer.toString(quantity);
+		
+
+	  //  System.out.println("Menu ID :"+menuid);
+	//    System.out.println("");
+	//    System.out.println(" Menu Name :"+name);
+		
+		if(sessionFlag==false)
+		{ 
+			Cart.add(menu);
+			session.setAttribute("cart", Cart);
+			sessionFlag = true;
+		}
+		else
+		{ 
+			  
+		    ArrayList<String[]> attribute = (ArrayList<String[]>)session.getAttribute("cart");
+		    
+			 Cart = attribute;
+			 Cart.add(menu);
+			 session.setAttribute("cart", Cart);
+		}
+		
+        // session.setAttribute("cart", Cart);
+	    
+
+
+		// DatabaseService ds=new DatabaseService();
+		// List<MenuItem> menu = ds.findItem();
+	    // session.setAttribute("cart", menu);
+		// System.out.println(session.getAttribute("cart"));
+	
+//		System.out.println("Session State :"+session.isNew());
+		
+		// System.out.println(menu.get(0).getName());
+/*
+		if(session.isNew())
+		  { 
+			 Cart.add(menu);
+			 session.setAttribute("cart", Cart);
+			
+		  }
+		else 
+		{ 
+		     ArrayList<MenuItem> attribute = (ArrayList<MenuItem>)session.getAttribute("cart");
+			 Cart = attribute;
+			 Cart.add(menu);
+			 
+		}
+		session.setAttribute("cart", Cart);
+		
+		*/
+		
+	
+		
+
+		return "redirect:/items/viewall";
+		
+	}
 	@RequestMapping(value="/items/enable/{id}", method=RequestMethod.POST)
 	public String enableItem(@PathVariable("id") int id) {
 		DatabaseService ds=new DatabaseService();
