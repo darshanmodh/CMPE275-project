@@ -29,7 +29,7 @@
 	<div class="container">
 		<ul class="nav nav-tabs">
 			<li class="active"><a data-toggle="tab" href="#"><%=user%></a></li>
-			<li><a data-toggle="tab" href="#">Menu</a></li>
+			<li><a href="/cmpe275/items/viewall">Menu</a></li>
 			<li><a data-toggle="tab" href="#">Shopping Cart</a></li>
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>

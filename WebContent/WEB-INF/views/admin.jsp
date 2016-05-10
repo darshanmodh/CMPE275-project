@@ -29,15 +29,10 @@
 	<div class="container">
 		<ul class="nav nav-tabs">
 			<li class="active"><a data-toggle="tab" href="#"><%=user%></a></li>
-			<li><a data-toggle="tab" href="#">Menu</a></li>
+			<li><a href="/cmpe275/items/viewall">Menu</a></li>
 			<li><a data-toggle="tab" href="#">Add Menu Item</a></li>
 			<li><a data-toggle="tab" href="#">Delete Menu Item</a></li>
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
-		<div class="tab-content">
-			<div id="Register" class="tab-pane fade in active">
-				<div id="Logout" class="tab-pane fade"></div>
-			</div>
-		</div>
 	</div>
 </body>
