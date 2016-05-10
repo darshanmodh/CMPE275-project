@@ -67,8 +67,10 @@ public class UserController {
 	public String loginPage(HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession(false);
-			if (session.getAttribute("user") != null) {
+			if (session.getAttribute("user") != null && session.getAttribute("role").equals('U')) {
 				return "customer";
+			} else if(session.getAttribute("user") != null && session.getAttribute("role").equals('A')) {
+				return "admin";
 			}
 		} catch (NullPointerException e) {
 			System.out.println("NullPointerException - No session available");
@@ -95,8 +97,10 @@ public class UserController {
 				char isAdmin = '\0';
 				isAdmin = databaseService.isAdmin(email);
 				if (isAdmin == 'A') {
+					session.setAttribute("role", isAdmin);
 					return "admin";
 				} else if (isAdmin == 'U') {
+					session.setAttribute("role", isAdmin);
 					return "customer";
 				} else {
 					return "registration";

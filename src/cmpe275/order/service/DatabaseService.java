@@ -1,5 +1,6 @@
 package cmpe275.order.service;
 
+import java.awt.Menu;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
+
+import org.apache.tomcat.util.codec.binary.Base64;
 
 import cmpe275.order.model.MenuItem;
 import cmpe275.order.model.User;
@@ -26,7 +29,8 @@ public class DatabaseService {
 		entityManager = entityManagerFactory.createEntityManager();
 	}
 
-	public void addItem(MenuItem menu) {
+	public void addItem(MenuItem menu) throws SQLException {
+		System.out.println("len_add = " + menu.getPicture().length());
 		entityManager.getTransaction().begin();
 		entityManager.persist(menu);
 		entityManager.getTransaction().commit();
@@ -37,6 +41,24 @@ public class DatabaseService {
 		entityManager.getTransaction().begin();
 		Query query = entityManager.createQuery("update MenuItem m set m.isEnabled=0 where m.menuId="+id+"");
 		query.executeUpdate();
+		entityManager.getTransaction().commit();
+		entityManager.close();
+		entityManagerFactory.close();
+	}
+	
+	public void updatePicture(int itemId, Blob pic) throws SQLException {
+		System.out.println("len = "+pic.length());		
+		Query query = entityManager.createQuery("update MenuItem m SET m.picture='" + pic + "' WHERE m.menuId=:itemId");
+		query.setParameter("itemId", itemId);		
+		query.executeUpdate();
+	}
+	
+	public void updateMenuItem(int itemId, MenuItem menu) throws SQLException {
+		entityManager.getTransaction().begin();
+		Query query = entityManager.createQuery("update MenuItem m SET m.name='" + menu.getName() + "', m.category='" + menu.getCategory() + "', m.unitPrice='" + menu.getUnitPrice() + "', m.calories='" + menu.getCalories() + "', m.prepTime='" + menu.getPrepTime() + "' WHERE m.menuId=:itemId");	
+		query.setParameter("itemId", itemId);
+		query.executeUpdate();
+		updatePicture(itemId, menu.getPicture());
 		entityManager.getTransaction().commit();
 		entityManager.close();
 		entityManagerFactory.close();
@@ -53,7 +75,7 @@ public class DatabaseService {
 	}
 	
 	public List<MenuItem> viewAllItems() {
-		Query query = entityManager.createQuery("select m.menuId,m.name,m.category from MenuItem m where m.isEnabled=1");
+		Query query = entityManager.createQuery("select m.menuId,m.name,m.category,m.unitPrice,m.calories from MenuItem m where m.isEnabled=1");
 		@SuppressWarnings("unchecked")
 		List<Object[]> menu =  query.getResultList();
 		List<MenuItem> menuList = new ArrayList<MenuItem>();
@@ -62,6 +84,8 @@ public class DatabaseService {
 			mi.setMenuId((int) m[0]);
 			mi.setName((String) m[1]);
 			mi.setCategory((String) m[2]);
+			mi.setUnitPrice((float) m[3]);
+			mi.setCalories((float) m[4]);
 			menuList.add(mi);
 		}
 		//System.out.println(menuList.get(0).getName());
@@ -85,9 +109,20 @@ public class DatabaseService {
 	}
 	
 	public MenuItem viewItem(int menuId) {
-		Query query = entityManager.createQuery("select m from MenuItem m where m.menuId="+menuId+"");
-		MenuItem menu = (MenuItem) query.getSingleResult();
-		return menu;
+		Query query = entityManager.createQuery("select m.menuId,m.name,m.category,m.unitPrice,m.calories,m.prepTime from MenuItem m where m.menuId=:menuId");
+		query.setParameter("menuId", menuId);
+		@SuppressWarnings("unchecked")
+		List<Object[]> menu =  query.getResultList();
+		MenuItem mi = new MenuItem();
+		for (Object[] m: menu) {
+			mi.setMenuId((int) m[0]);
+			mi.setName((String) m[1]);
+			mi.setCategory((String) m[2]);
+			mi.setUnitPrice((float) m[3]);
+			mi.setCalories((float) m[4]);
+			mi.setPrepTime((int) m[5]);
+		}
+		return mi;
 	}
 
 	public Blob getImage(int menuId) throws SerialException, SQLException {
