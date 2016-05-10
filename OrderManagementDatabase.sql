@@ -42,14 +42,28 @@ CREATE TABLE OrderDetail (
         REFERENCES FoodOrder (orderId)
 );
 
+
 CREATE TABLE OrdersPlaced (
+  orderId int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
   chefId int(11) NOT NULL,
   prepDate date NOT NULL,
   startTime time NOT NULL,
   endTime time DEFAULT NULL,
-  orderId int(11) DEFAULT NULL,
-  PRIMARY KEY (chefId,prepDate,startTime)
+  email VARCHAR(50),
+  contents VARCHAR(200),
+  totalPrice FLOAT
 );
 
+delimiter //
+CREATE TRIGGER check_trigger
+  BEFORE INSERT
+  ON MenuItem
+  FOR EACH ROW
+BEGIN
+
+  IF NEW.menuId <0 or New.menuId>999  THEN
+	signal sqlstate '45000' set message_text = 'My Error Message';
+	END IF;
+END//
 insert into User values('admin@admin.com','admin','A','0000',true);
 					
