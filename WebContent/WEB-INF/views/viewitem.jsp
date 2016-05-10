@@ -141,5 +141,91 @@
 		</c:forEach>
 	</div>
 
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">OrderNow</a>
+    </div>
+<div class="container">
+  
+  <!-- Trigger the modal with a button -->
+  
+  <form method="get" action="/cmpe275/items/getCartdetails">
+     
+ 
+  <button type="button" class="btn btn-info btn-lg pull-right" data-toggle="modal" data-target="#ShoppingCartModel">
+  
+  Shopping Cart</button>
+  
+  
+ 
+          
+  <!-- Modal -->
+  <div class="modal fade" id="ShoppingCartModel" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Shopping Cart </h4>
+        </div>
+        <div class="modal-body">
+        
+         
+        
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+   </form>
+</div>
+    <button type="button" class="btn btn-info btn-lg pull-right">
+          <span class="glyphicon glyphicon-shopping-cart"></span> Shopping Cart
+        </button>
+  </div>
+</nav>
+<div class="row">
+<c:set var="isDisabled" value="${isDisabled}"/>
+  <c:forEach items="${list}" var="menu">
+  <div class="col-lg-4">
+  <div class="thumbnail">
+    <a  href="/cmpe275/items/${menu.menuId}">
+      <img class="img-rounded" src="/cmpe275/items/${menu.menuId}/picture"></img>
+    </a>
+       <div class="caption">
+    		<h3>${menu.name}</h3>
+    		<h4>${menu.category}</h4>
+       </div>
+       
+       <c:if test="${isDisabled==1}">
+	       <form method="post" action="/cmpe275/items/enable/${menu.menuId}">
+	       <button class="btn btn-danger" role="button"> 
+	       <span class="glyphicon glyphicon-ok"></span> Enable 
+       </button>
+       </form>
+       </c:if>
+       <c:if test="${isDisabled== 0}">
+	       <form method="post" action="/cmpe275/items/delete/${menu.menuId}">
+	       <button class="btn btn-danger" role="button"> 
+	       <span class="glyphicon glyphicon-remove"></span> Remove 
+	       </button>
+	       </form>
+	        <button class="btn btn-danger" role="button"> 
+	       <span class="glyphicon glyphicon-plus-sign"></span> Add to Cart 
+	       </button>
+       </c:if>
+        <button class="btn btn-danger" role="button"> 
+       <span class="glyphicon glyphicon-plus-sign"></span> Add to Cart 
+       </button>
+    </div>
+  </div>
+    </c:forEach>
+</div>
+
 </body>
 </html>
