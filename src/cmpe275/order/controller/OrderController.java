@@ -2,9 +2,12 @@ package cmpe275.order.controller;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.Blob;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,12 +16,12 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,15 +29,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import java.sql.Blob;
-import java.sql.Date;
-
-import javax.servlet.http.HttpSession;
-
 import cmpe275.order.model.MenuItem;
+import cmpe275.order.model.OrdersPlaced;
 import cmpe275.order.model.ShoppingCart;
 import cmpe275.order.service.DatabaseService;
 import cmpe275.order.service.OrderAlgo;
@@ -86,13 +84,22 @@ public class OrderController {
 		return "redirect:/items/viewall";
 	}
 
-@RequestMapping(value="/items/getCustomerDetails", method=RequestMethod.GET)
-	public @ResponseBody List<String[]> getCustomerOrderDetails(HttpServletRequest request)
-	{
-	    List details = new ArrayList();
-	    DatabaseService ds = new DatabaseService();    
-	    List<Object[]> resultSet = ds.getCustomerOrderDetails();
-	    return details;
+	@RequestMapping(value = "/items/showOrders", method = RequestMethod.GET)
+	public String getCustomerOrderDetails() {
+			return "OrdersFilter";
+		}
+	@RequestMapping(value = "/items/getCustomerDetails", method = RequestMethod.GET)
+	public ModelAndView getCustomerOrderDetails(@RequestParam("startDate") Date startDate, @RequestParam("endDate") Date endDate,HttpServletRequest request) {
+
+		DatabaseService ds = new DatabaseService();
+
+		List<OrdersPlaced> resultSet = ds.getCustomerOrderDetails(startDate,endDate);
+
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("ordersList", resultSet);
+		mav.setViewName("orders");
+		return mav;
+	
 	}
 
 @SuppressWarnings("unchecked")
@@ -123,115 +130,152 @@ public class OrderController {
 	}
 	
 @RequestMapping(value="/items/orderNow", method=RequestMethod.POST)
-	
-	public @ResponseBody JsonObject orderNow(HttpServletRequest request) 
-	  {
-	HttpSession session = request.getSession(false);
 
-	Date dop = new Date(2016 - 1900, 4, 10);
-	
-	int chefId=1;
-	boolean orderCreated=false;
-	
-	
-	Time pickupTime2=new Time(16,0,0);
-	//int prepTime = 25;
-	
-	boolean manualInput=false;
-	////////
-	OrderAlgo obj = new OrderAlgo();
-	JsonObject jObj = new JsonObject();
-	if(manualInput)
+public @ResponseBody JsonObject orderNow(@RequestParam(value="dop",required=false) Date dop, @RequestParam(value="pickupTime", required=false) Time pickupTime, HttpServletRequest request) 
+  {
+HttpSession session = request.getSession(false);
+
+System.out.println(dop+" "+pickupTime);
+
+
+//Date dop = new Date(2016 - 1900, 4, 11);
+
+int chefId=1;
+boolean orderCreated=false;
+
+
+//Time pickupTime2=new Time(16,0,0);
+//int prepTime = 25;
+
+boolean manualInput=false;
+////////
+OrderAlgo obj = new OrderAlgo();
+JsonObject jObj = new JsonObject();
+
+
+if((int)session.getAttribute("totalPrepTime")>60)
+{
+	jObj.addProperty("success", "cannot place");
+	jObj.addProperty("msg","Order not possible, please revise the Items/Quantities");
+	return jObj;
+
+}
+
+
+
+
+
+if(dop!=null)
+{
+	//6AM and 9PM check
+	if(pickupTime.getHours()<6 || (pickupTime.getHours()==21 && pickupTime.getMinutes()>0) || (pickupTime.getHours()>21 && pickupTime.getMinutes()>=0))
 	{
-		boolean result=obj.userProvidedTimeSlot(dop, (int)session.getAttribute("totalPrepTime"), pickupTime2);
-		if(result) {
-			jObj.addProperty("success", "manual order placed");
-			jObj.addProperty("msg","order created");
-			session.removeAttribute("cart");
-		}
-			
-		else 
-		{
-			Time result2=obj.earliestAvailableTimeSlot(dop, (int)session.getAttribute("totalPrepTime"));
-			if(result2!=null) {
-				jObj.addProperty("success", "cannot place");
-				jObj.addProperty("msg","Order not possible at given time, earliest possible time is "+result2+", please revise the order");
-			} else {
-				jObj.addProperty("success", "cannot place");
-				jObj.addProperty("msg","Order not possible, please revise the Items/Quantities/Pickup time/Date");
-			}
+		jObj.addProperty("success", "cannot place");
+		jObj.addProperty("msg","Order should be placed between 6AM and 9PM");
+		return jObj;
 
-		}
-		
 	}
+
+	
+	boolean result=obj.userProvidedTimeSlot(dop, (int)session.getAttribute("totalPrepTime"), pickupTime);
+	if(result) {
+		jObj.addProperty("success", "manual order placed");
+		jObj.addProperty("msg","order created");
+		session.removeAttribute("cart");
+		session.setAttribute("totalPrepTime",0);
+	}
+		
 	else 
 	{
-		Time result=obj.earliestAvailableTimeSlot(dop, (int)session.getAttribute("totalPrepTime"));
-		if(result!=null)
-		{
-			jObj.addProperty("success","auto order placed");
-			session.removeAttribute("cart");
-			jObj.addProperty("msg", "Order created ");//+obj.userProvidedTimeSlot(dop, (int)session.getAttribute("totalPrepTime"), result));
-			System.out.println("Order created "+obj.userProvidedTimeSlot(dop, (int)session.getAttribute("totalPrepTime"), result));
-		}else {
+		Calendar calendar=Calendar.getInstance();	
+		Time result2=obj.earliestAvailableTimeSlot(new Date(calendar.getTime().getYear(),calendar.getTime().getMonth(),calendar.getTime().getDate()), (int)session.getAttribute("totalPrepTime"));
+		if(result2!=null) {
+			jObj.addProperty("success", "cannot place");
+			jObj.addProperty("msg","Order not possible at given time, earliest possible time is "+result2+", please revise the order");
+		} else {
 			jObj.addProperty("success", "cannot place");
 			jObj.addProperty("msg","Order not possible, please revise the Items/Quantities/Pickup time/Date");
 		}
-		
+
 	}
-		
-	System.out.println(jObj);
-	return jObj;
-
-	  }
 	
-	
-
-	
-@RequestMapping(value="/items/shoppingCart", method=RequestMethod.POST)	
-	public String addToShoppingCart(@RequestParam("menuid") int menuid,
-			                        @RequestParam("menuName") String name, 
-			                        @RequestParam("quantity") int quantity,
-			                        @RequestParam("prepTime") int prepTime,
-			                        HttpServletRequest request) 
+}
+else 
+{
+	Calendar calendar=Calendar.getInstance();	
+	Time result=obj.earliestAvailableTimeSlot(new Date(calendar.getTime().getYear(),calendar.getTime().getMonth(),calendar.getTime().getDate()), (int)session.getAttribute("totalPrepTime"));
+	if(result!=null)
 	{
-		// Get HTTPSession from the user 
-
-		HttpSession session = request.getSession(false);
-				if(session.getAttribute("totalPrepTime")!=null)
-		{
-			session.setAttribute("totalPrepTime", (int)session.getAttribute("totalPrepTime")+(prepTime*quantity));
-		}
-		else
-			session.setAttribute("totalPrepTime", prepTime*quantity);
-
-		//System.out.println("totalPrepTime "+session.getAttribute("totalPrepTime"));
+		jObj.addProperty("success","auto order placed");
+		//System.out.println("total prep time "+(int)session.getAttribute("totalPrepTime"));
+		System.out.println("Order created "+obj.userProvidedTimeSlot(new Date(calendar.getTime().getYear(),calendar.getTime().getMonth(),calendar.getTime().getDate()), (int)session.getAttribute("totalPrepTime"), result));
+		session.removeAttribute("cart");
+		session.removeAttribute("totalPrepTime");
+		jObj.addProperty("msg", "Order created ");//+obj.userProvidedTimeSlot(dop, (int)session.getAttribute("totalPrepTime"), result));
 		
-		HashMap cart;
-		if(session.getAttribute("cart")!=null)
-			cart=(HashMap)session.getAttribute("cart");
-
-		else	
-		 cart=new HashMap();
 		
-			if(!cart.containsKey(name))
-				cart.put(name,quantity);
-			else
-			cart.put(name,(int)(cart.get(name))+quantity);
-			session.setAttribute("cart", cart);
-			
-			
-			Set set = cart.entrySet();
-		      // Get an iterator
-		      Iterator i = set.iterator();
-		      // Display elements
-		      while(i.hasNext()) {
-		         Map.Entry me = (Map.Entry)i.next();
-		         System.out.print(me.getKey() + ": ");
-		         System.out.println(me.getValue());
-		      }
-		return "redirect:/items/viewall";
+	}else {
+		jObj.addProperty("success", "cannot place");
+		jObj.addProperty("msg","Order not possible, please revise the Items/Quantities/Pickup time/Date");
 	}
+	
+}
+	
+System.out.println(jObj);
+return jObj;
+
+  }
+	
+	
+
+	
+@RequestMapping(value="/items/shoppingCart", method=RequestMethod.POST)
+
+public String addToShoppingCart(@RequestParam("menuid") int menuid,
+		                        @RequestParam("menuName") String name, 
+		                        @RequestParam("quantity") int quantity,
+		                        @RequestParam("prepTime") int prepTime,
+		                         HttpServletRequest request) 
+{
+	// Get HTTPSession from the user 
+
+	HttpSession session = request.getSession(false);
+			if(session.getAttribute("totalPrepTime")!=null)
+	{
+		session.setAttribute("totalPrepTime", (int)session.getAttribute("totalPrepTime")+(prepTime*quantity));
+
+		
+	}
+	else
+		session.setAttribute("totalPrepTime", prepTime*quantity);
+
+	System.out.println("totalPrepTime "+session.getAttribute("totalPrepTime"));
+	
+	HashMap cart;
+	if(session.getAttribute("cart")!=null)
+		cart=(HashMap)session.getAttribute("cart");
+
+	else	
+	 cart=new HashMap();
+	
+		if(!cart.containsKey(name))
+			cart.put(name,quantity);
+		else
+		cart.put(name,(int)(cart.get(name))+quantity);
+		session.setAttribute("cart", cart);
+		
+		
+		Set set = cart.entrySet();
+	      // Get an iterator
+	      Iterator i = set.iterator();
+	      // Display elements
+	      while(i.hasNext()) {
+	         Map.Entry me = (Map.Entry)i.next();
+	         System.out.print(me.getKey() + ": ");
+	         System.out.println(me.getValue());
+	      }
+	return "redirect:/items/viewall";
+}
 	
 	@RequestMapping(value="/items/enable/{id}", method=RequestMethod.POST)
 	public String enableItem(@PathVariable("id") int id) {

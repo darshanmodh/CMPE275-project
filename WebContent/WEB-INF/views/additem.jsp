@@ -10,13 +10,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <%
-if(session.getAttribute("role").equals('U')) {
-	response.sendRedirect("/cmpe275/items/viewall");
-}
-String user = null;
-if (session.getAttribute("user") != null) {
-	user = (String) session.getAttribute("user");
-}
+try{
+	if(session.getAttribute("role").equals('U')) {
+		response.sendRedirect("/cmpe275/items/viewall");
+	}
+	String user = null;
+	if (session.getAttribute("user") != null) {
+		user = (String) session.getAttribute("user");
+	}
 %>
 
 <spring:url value="/resources/assets/css/bootstrap.min.css"
@@ -31,6 +32,8 @@ if (session.getAttribute("user") != null) {
 
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+<spring:url value="/resources/assets/js/bootstrap.min.js" var="mainJs" />
+<script src="${mainJs}"></script>
 
 <script type="text/javascript">
 $(document).ready(function(){
@@ -69,10 +72,16 @@ function readURL(input) {
 	<div class="container">
 		<ul class="nav nav-tabs">
 			<li><a href="/cmpe275/user/login"><%=user%></a></li>
-			<li><a href="/cmpe275/items/viewall">Menu</a></li>
+			<li class="dropdown">
+		        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Menu
+		        <span class="caret"></span></a>
+		        <ul class="dropdown-menu">
+		        	<li><a href="/cmpe275/items/viewall">All Menu Items</a></li>
+		          <li><a href="/cmpe275/items/viewdisabled">Enable Menu Items</a></li>
+		        </ul>
+     		 </li>
 			<li class="active"><a href="/cmpe275/">Add Menu Item</a></li>
-			<li><a data-toggle="tab" href="#">Enable Menu Item</a></li>
-			<li><a data-toggle="tab" href="#">Order Status</a></li>
+			<li><a href="/cmpe275/items/showOrders">Order Status</a></li>
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
 	</div>
@@ -111,3 +120,8 @@ function readURL(input) {
 </body>
 </html>
 
+<%
+} catch(NullPointerException e) {
+	response.sendRedirect("/cmpe275/user/login");
+}
+%>

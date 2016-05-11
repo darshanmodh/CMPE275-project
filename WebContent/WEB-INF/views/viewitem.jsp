@@ -48,7 +48,7 @@
 				try {
 					if (session.getAttribute("role").equals('U')) {
 			%>
-				<li><a data-toggle="tab" href="#"><%=user%></a></li>
+				<li><a href="/cmpe275/user/login"><%=user%></a></li>
 				<li class="active"><a href="/cmpe275/items/viewall">Menu</a></li>
 				<li><a href="#">Orders</a></li>			
 				<li><a href="/cmpe275/user/logout">Logout</a></li>
@@ -62,10 +62,16 @@
 				} else if (session.getAttribute("role").equals('A')) {
 			%>
 					<li><a href="/cmpe275/user/login"><%=user%></a></li>
-					<li class="active"><a href="/cmpe275/items/viewall">Menu</a></li>
-					<li><a href="/cmpe275">Add Menu Item</a></li>
-					<li><a href="/cmpe275/items/viewdisabled">Enable Menu Item</a></li>
-					<li><a href="/cmpe275/items/orderNow">Order Status</a></li>
+					<li class="dropdown active">
+				        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Menu
+				        <span class="caret"></span></a>
+				        <ul class="dropdown-menu">
+				        	<li><a href="/cmpe275/items/viewall">All Menu Items</a></li>
+				          <li><a href="/cmpe275/items/viewdisabled">Enable Menu Items</a></li>
+				        </ul>
+     				</li>
+					<li><a href="/cmpe275/">Add Menu Item</a></li>
+					<li><a href="/cmpe275/items/showOrders">Order Status</a></li>
 					<li><a href="/cmpe275/user/logout">Logout</a></li>
 			<form method="POST" action="/cmpe275/orders/deleteall">
 			<input type="hidden" name="_method" value="DELETE">

@@ -30,11 +30,17 @@
 	%>
 	<div class="container">
 		<ul class="nav nav-tabs">
-			<li class="active"><a data-toggle="tab" href="#"><%=user%></a></li>
-			<li><a href="/cmpe275/items/viewall">Menu</a></li>
+			<li class="active"><a href="/cmpe275/user/login"><%=user%></a></li>
+			<li class="dropdown">
+		        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Menu
+		        <span class="caret"></span></a>
+		        <ul class="dropdown-menu">
+		        	<li><a href="/cmpe275/items/viewall">All Menu Items</a></li>
+		          <li><a href="/cmpe275/items/viewdisabled">Enable Menu Items</a></li>
+		        </ul>
+     		 </li>
 			<li><a href="/cmpe275/">Add Menu Item</a></li>
-			<li><a href="/cmpe275/items/viewall">Enable Menu Item</a></li>
-			<li><a data-toggle="tab" href="#">Order Status</a></li>
+			<li><a href="/cmpe275/items/showOrders">Order Status</a></li>
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
 	</div>
