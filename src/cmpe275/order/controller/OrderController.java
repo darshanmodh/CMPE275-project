@@ -224,6 +224,16 @@ System.out.println("PIC ADD = " + picture);
 		//database.updatePicture(itemId, blob);
 		return "redirect:/items/viewall";
 	}
+	
+	@RequestMapping(value = "/items/category/{category}", method = RequestMethod.POST)
+	public ModelAndView getItemByCategory(@PathVariable("category") String category) {
+		ModelAndView mav = new ModelAndView();
+		DatabaseService database = new DatabaseService();
+		List<MenuItem> menuItems = database.getItemsByCategory(category);
+		mav.addObject("list", menuItems);
+		mav.setViewName("viewitem");
+		return mav;
+	}
 
 	public DatabaseService getDatabaseService() {
 		return databaseService;
