@@ -14,6 +14,8 @@
 
 <spring:url value="/resources/assets/css/style.css" var="styleCss" />
 <link href="${styleCss}" rel="stylesheet">
+<spring:url value="/resources/assets/css/style2.css" var="styleCss2" />
+<link href="${styleCss2}" rel="stylesheet">
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js" > </script>
 <spring:url value="/resources/assets/js/bootstrap.min.js" var="mainJs" />
@@ -30,8 +32,9 @@
 		<ul class="nav nav-tabs">
 			<li class="active"><a data-toggle="tab" href="#"><%=user%></a></li>
 			<li><a href="/cmpe275/items/viewall">Menu</a></li>
-			<li><a data-toggle="tab" href="#">Add Menu Item</a></li>
-			<li><a data-toggle="tab" href="#">Delete Menu Item</a></li>
+			<li><a href="/cmpe275/">Add Menu Item</a></li>
+			<li><a href="/cmpe275/items/viewall">Enable Menu Item</a></li>
+			<li><a data-toggle="tab" href="#">Order Status</a></li>
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
 	</div>

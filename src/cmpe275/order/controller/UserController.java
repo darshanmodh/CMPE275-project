@@ -28,8 +28,10 @@ public class UserController {
 	public String getDefault(HttpServletRequest request) {
 		try {
 			HttpSession session = request.getSession(false);
-			if (session.getAttribute("user") != null) {
+			if (session.getAttribute("user") != null && session.getAttribute("role").equals('U')) {
 				return "customer";
+			} else if(session.getAttribute("user") != null && session.getAttribute("role").equals('A')) {
+				return "admin";
 			}
 		} catch (NullPointerException e) {
 			System.out.println("NullPointerException - No session available");

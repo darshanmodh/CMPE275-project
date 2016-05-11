@@ -60,7 +60,7 @@ public class DatabaseService {
 		Query query = entityManager.createQuery("update MenuItem m SET m.name='" + menu.getName() + "', m.category='" + menu.getCategory() + "', m.unitPrice='" + menu.getUnitPrice() + "', m.calories='" + menu.getCalories() + "', m.prepTime='" + menu.getPrepTime() + "' WHERE m.menuId=:itemId");	
 		query.setParameter("itemId", itemId);
 		query.executeUpdate();
-		updatePicture(itemId, menu);
+		//updatePicture(itemId, menu);
 		entityManager.getTransaction().commit();
 		entityManager.close();
 		entityManagerFactory.close();

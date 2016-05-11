@@ -5,6 +5,15 @@
 
 <title>Order Management System</title>
 <head>
+<%
+try {
+if (session.getAttribute("user")!=null) {
+	response.sendRedirect("/cmpe275/user/login");
+}
+} catch(NullPointerException e) {
+	response.sendRedirect("registration");
+}
+%>
 	<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">

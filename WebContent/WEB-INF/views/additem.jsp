@@ -9,13 +9,25 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<%
+if(session.getAttribute("role").equals('U')) {
+	response.sendRedirect("/cmpe275/items/viewall");
+}
+String user = null;
+if (session.getAttribute("user") != null) {
+	user = (String) session.getAttribute("user");
+}
+%>
+
 <spring:url value="/resources/assets/css/bootstrap.min.css"
 	var="mainCss" />
 <link href="${mainCss}" rel="stylesheet">
 
-<spring:url value="/resources/assets/css/style2.css" var="styleCss" />
-<link href="${styleCss}" rel="stylesheet">
+<spring:url value="/resources/assets/css/style2.css" var="styleCss2" />
+<link href="${styleCss2}" rel="stylesheet">
 
+<spring:url value="/resources/assets/css/style.css" var="styleCss" />
+<link href="${styleCss}" rel="stylesheet">
 
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
@@ -27,11 +39,8 @@ $(document).ready(function(){
 
 });
 function readURL(input) {
-	
             if (input.files && input.files[0]) {
-
                 var reader = new FileReader();
-
                 reader.onload = function (e) {
                     $('#picture')
                         .attr('src', e.target.result)
@@ -40,10 +49,7 @@ function readURL(input) {
                         document.getElementById("picture").style.visibility="visible";
                         document.getElementById("divId").value = e.target.result.split(",")[1];
                 };
-			
-
                 reader.readAsDataURL(input.files[0]);
-                
             }
             else
             {
@@ -51,9 +57,7 @@ function readURL(input) {
                         .width(0)
                         .height(0);
    	         document.getElementById("picture").style.visibility="hidden";
-
 			}
-            
         }
         
 </script>
@@ -63,10 +67,17 @@ function readURL(input) {
 </head>
 <body id="bod">
 	<div class="container">
-
+		<ul class="nav nav-tabs">
+			<li><a href="/cmpe275/user/login"><%=user%></a></li>
+			<li><a href="/cmpe275/items/viewall">Menu</a></li>
+			<li class="active"><a href="/cmpe275/">Add Menu Item</a></li>
+			<li><a data-toggle="tab" href="#">Enable Menu Item</a></li>
+			<li><a data-toggle="tab" href="#">Order Status</a></li>
+			<li><a href="/cmpe275/user/logout">Logout</a></li>
+		</ul>
+	</div>
+	<div class="container">
 		<form class="form-signin" method="post" action="/cmpe275/items/add">
-			<h2 class="heading">Add Menu Item</h2>
-
 			<input id="name" class="form-control" type="text"
 				placeholder="Item Name" name="name" required autofocus> <label
 				class="form-label">Picture</label> <input id="inputFileToLoad"  type="file"

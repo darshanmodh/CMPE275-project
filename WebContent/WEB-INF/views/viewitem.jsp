@@ -1,3 +1,4 @@
+<%@page import="cmpe275.order.model.MenuItem"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
@@ -6,6 +7,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<%
+		String user = null;
+		if (session.getAttribute("user") != null) {
+			user = (String) session.getAttribute("user");
+		}
+%>
 <title>Order Management System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <spring:url value="/resources/assets/css/bootstrap.min.css"
@@ -31,30 +38,35 @@
 	                $("#subViewDiv").html( response );
 	            }
 	        });
-	    }
-	 	
-	 
+	    } 
 </script>
 </head>
 <body>
-	<nav class="navbar navbar-default">
-		<div class="container-fluid">
-			<div class="navbar-header">
-				<a class="navbar-brand" href="#">OrderNow</a>
-			</div>
+	<div class="container">
+		<ul class="nav nav-tabs">
 			<%
 				try {
 					if (session.getAttribute("role").equals('U')) {
 			%>
-			<form method="get" action="/cmpe275/items/getCartdetails">
-			<button type="submit" class="btn btn-info btn-lg pull-right">
-				<span class="glyphicon glyphicon-shopping-cart"></span> Shopping
-				Cart
-			</button>
-			</form>
+				<li><a data-toggle="tab" href="#"><%=user%></a></li>
+				<li class="active"><a href="/cmpe275/items/viewall">Menu</a></li>
+				<li><a href="#">Orders</a></li>			
+				<li><a href="/cmpe275/user/logout">Logout</a></li>
+				<form method="get" action="/cmpe275/items/getCartdetails">
+					<button type="submit" class="btn btn-info btn-lg pull-right">
+						<span class="glyphicon glyphicon-shopping-cart"></span> Shopping
+						Cart
+					</button>
+				</form>
 			<%
 				} else if (session.getAttribute("role").equals('A')) {
 			%>
+					<li><a href="/cmpe275/user/login"><%=user%></a></li>
+					<li class="active"><a href="/cmpe275/items/viewall">Menu</a></li>
+					<li><a href="/cmpe275">Add Menu Item</a></li>
+					<li><a href="/cmpe275/items/viewdisabled">Enable Menu Item</a></li>
+					<li><a href="/cmpe275/items/orderNow">Order Status</a></li>
+					<li><a href="/cmpe275/user/logout">Logout</a></li>
 			<form method="POST" action="/cmpe275/orders/deleteall">
 			<input type="hidden" name="_method" value="DELETE">
 			<button type="submit" class="btn btn-danger btn-lg pull-right">
@@ -69,9 +81,9 @@
 					response.sendRedirect("/cmpe275/user/login");
 				}
 			%>
-
-		</div>
-	</nav>
+		</ul>
+	</div>
+	<br>
  	<c:set var="isDisabled" value="${isDisabled}"/>
 	<div class="row">
 		<c:forEach items="${list}" var="menu">
@@ -110,20 +122,20 @@
 						<input type="hidden" id="menuName" name="menuName" value='${menu.name}'>
 						<input type="hidden" name="prepTime" value='${menu.prepTime}'>
 			   			</div>
-			   			</form> 
-					<%
+			   		</form>
+					<%	
 						} else if (session.getAttribute("role").equals('A')) {
 					%>
 					
 
 					<c:if test="${isDisabled==1}">
 				       <form method="post" action="/cmpe275/items/enable/${menu.menuId}">
-				       <button class="btn btn-danger" role="button"> 
+				       <button class="btn btn-success" role="button"> 
 				       <span class="glyphicon glyphicon-ok"></span> Enable 
 			       	   </button>
       				   </form>
        				</c:if>
-       				<c:if test="${isDisabled== 0}">
+       				<c:if test="${isDisabled==0}">
 					<form class="btn-group" method="post"
 						action="/cmpe275/items/delete/${menu.menuId}">
 						<input type="hidden" class="btn">
@@ -163,7 +175,7 @@
 					</div>
 				</div>
 			</div>
-		</c:forEach>
+		</c:forEach>		
 	</div>
 
 </body>
