@@ -4,6 +4,7 @@ import java.awt.Menu;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -17,6 +18,7 @@ import javax.sql.rowset.serial.SerialException;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 import cmpe275.order.model.MenuItem;
+import cmpe275.order.model.OrdersPlaced;
 import cmpe275.order.model.User;
 
 public class DatabaseService {
@@ -228,4 +230,33 @@ public class DatabaseService {
 		return isAdmin;
 	}
 	
+	public List getCustomerOrderDetails() {
+		
+		//	List<String> resultSet = new ArrayList<String>();
+			Query query = entityManager.createQuery("select op from OrdersPlaced op");
+			
+			List<OrdersPlaced> resultSet = query.getResultList();
+		
+			System.out.println(" Result Set ");
+			
+			for (OrdersPlaced m: resultSet) {
+			
+				System.out.println(" Start Time : ");
+			    System.out.println("  ");
+				 
+			Calendar cal=Calendar.getInstance();
+			System.out.println(cal.getTime()+" "+m.getPrepDate());
+
+			}
+			
+			return resultSet;		
+		}
+	
+	public void deleteOrders() {
+		entityManager.getTransaction().begin();
+		Query query = entityManager.createQuery("Delete from OrdersPlaced");
+		query.executeUpdate();
+		entityManager.getTransaction().commit();
+	}
+
 }

@@ -3,9 +3,13 @@ package cmpe275.order.controller;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
-
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,15 +22,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import java.sql.Blob;
+import java.sql.Date;
 
 import javax.servlet.http.HttpSession;
 
 import cmpe275.order.model.MenuItem;
 import cmpe275.order.service.DatabaseService;
+import cmpe275.order.service.OrderAlgo;
 
 @Controller
 public class OrderController {
@@ -76,81 +85,141 @@ System.out.println("PIC ADD = " + picture);
 		return "redirect:/items/viewall";
 	}
 
-    @SuppressWarnings("unchecked")
-	@RequestMapping(value="/items/getCartdetails", method=RequestMethod.GET)
-	public ModelAndView getCartDetails(HttpServletRequest request)
+@RequestMapping(value="/items/getCustomerDetails", method=RequestMethod.GET)
+	
+	public @ResponseBody List<String[]> getCustomerOrderDetails(HttpServletRequest request)
 	{
-		HttpSession session = request.getSession();
-		List<String[]> Cart = new ArrayList<String[]>();
-		Cart = (List<String[]>)session.getAttribute("cart");
-	        for (String[] m: Cart) {
-	        	System.out.println(" ID  : "+m[0]);
-	        	System.out.println(" Item Name : "+m[1]);
-	        	System.out.println(" Quantity : "+m[2]);
-	        }	
+	    List details = new ArrayList();
+	    DatabaseService ds = new DatabaseService();    
+	    List<Object[]> resultSet = ds.getCustomerOrderDetails();
+	    return details;
+	}
+
+@SuppressWarnings("unchecked")
+@RequestMapping(value="/items/getCartdetails", method=RequestMethod.GET)
+	
+	public @ResponseBody JsonArray getCartDetails(HttpServletRequest request)
+	{
 		
-	        ModelAndView mav = new ModelAndView();
-			mav.addObject("shoppingCart",Cart);
-			mav.setViewName("viewitem");
-			return mav;   
-			//	DatabaseService ds=new DatabaseService();
-			//	return "redirect:/items/viewall";
+		HttpSession session = request.getSession();
+		HashMap<String,Integer> cart = new HashMap<>();
+		cart = (HashMap<String, Integer>) session.getAttribute("cart");
+		JsonArray arr = new JsonArray();
+		for (String key:cart.keySet()) {
+			JsonObject obj = new JsonObject();
+			obj.addProperty("name",key);
+			obj.addProperty("quantity",cart.get(key));
+			arr.add(obj);
+			
+		}
+		return arr;
 	}
 	
-	@RequestMapping(value="/items/shoppingCart", method=RequestMethod.POST)
+@RequestMapping(value="/items/orderNow", method=RequestMethod.POST)
+	
+	public String orderNow(HttpServletRequest request) 
+	  {
+	HttpSession session = request.getSession(false);
+
+	Date dop = new Date(2016 - 1900, 4, 10);
+	
+	int chefId=1;
+	boolean orderCreated=false;
+	
+	
+	Time pickupTime2=new Time(16,0,0);
+	//int prepTime = 25;
+	
+	boolean manualInput=false;
+	////////
+	OrderAlgo obj = new OrderAlgo();
+
+	if(manualInput)
+	{
+		boolean result=obj.userProvidedTimeSlot(dop, (int)session.getAttribute("totalPrepTime"), pickupTime2);
+		if(result)
+			System.out.println("order created");
+		else 
+		{
+			Time result2=obj.earliestAvailableTimeSlot(dop, (int)session.getAttribute("totalPrepTime"));
+			if(result2!=null)
+				System.out.println("Order not possible at given time, earliest possible time is "+result2+", please revise the order");
+				else {
+					System.out.println("Order not possible, please revise the Items/Quantities/Pickup time/Date");
+				}
+
+		}
+		
+	}
+	else 
+	{
+		Time result=obj.earliestAvailableTimeSlot(dop, (int)session.getAttribute("totalPrepTime"));
+		if(result!=null)
+		{
+			System.out.println("Order created "+obj.userProvidedTimeSlot(dop, (int)session.getAttribute("totalPrepTime"), result));
+		}else {
+			System.out.println("Order not possible, please revise the Items/Quantities/Pickup time/Date");
+		}
+		
+	}
+		
+	
+	return "redirect:/items/viewall";
+
+	  }
+	
+	
+
+	
+@RequestMapping(value="/items/shoppingCart", method=RequestMethod.POST)
+	
 	public String addToShoppingCart(@RequestParam("menuid") int menuid,
 			                        @RequestParam("menuName") String name, 
 			                        @RequestParam("quantity") int quantity,
+			                        @RequestParam("prepTime") int prepTime,
 			                         HttpServletRequest request) 
 	{
-		// Get HTTPSession from the user
+		// Get HTTPSession from the user 
+
 		HttpSession session = request.getSession(false);
-		List<String[]> Cart = new ArrayList<String[]>();
-		String[] menu = new String[3];
-		menu[0] = Integer.toString(menuid);
-		menu[1] = name;
-		menu[2] = Integer.toString(quantity);
-		//  System.out.println("Menu ID :"+menuid);
-		//    System.out.println("");
-		//    System.out.println(" Menu Name :"+name);
-		
-		if(sessionFlag==false)
-		{ 
-			Cart.add(menu);
-			session.setAttribute("cart", Cart);
-			sessionFlag = true;
+				if(session.getAttribute("totalPrepTime")!=null)
+		{
+			session.setAttribute("totalPrepTime", (int)session.getAttribute("totalPrepTime")+(prepTime*quantity));
+
+			
 		}
 		else
-		{ 
-		    @SuppressWarnings("unchecked")
-			ArrayList<String[]> attribute = (ArrayList<String[]>)session.getAttribute("cart");		 
-			 Cart = attribute;
-			 Cart.add(menu);
-			 session.setAttribute("cart", Cart);
-		}
-        // session.setAttribute("cart", Cart);
-		// DatabaseService ds=new DatabaseService();
-		// List<MenuItem> menu = ds.findItem();
-	    // session.setAttribute("cart", menu);
-		// System.out.println(session.getAttribute("cart"));
-		// System.out.println("Session State :"+session.isNew());
-		// System.out.println(menu.get(0).getName());
-/*
-		if(session.isNew())
-		  { 
-			 Cart.add(menu);
-			 session.setAttribute("cart", Cart);
-		  }
-		else 
-		{ 
-		     ArrayList<MenuItem> attribute = (ArrayList<MenuItem>)session.getAttribute("cart");
-			 Cart = attribute;
-			 Cart.add(menu);
-		}
-		session.setAttribute("cart", Cart);
-		*/
+			session.setAttribute("totalPrepTime", prepTime*quantity);
+
+		//System.out.println("totalPrepTime "+session.getAttribute("totalPrepTime"));
+		
+		HashMap cart;
+		if(session.getAttribute("cart")!=null)
+			cart=(HashMap)session.getAttribute("cart");
+
+		else	
+		 cart=new HashMap();
+		
+			if(!cart.containsKey(name))
+				cart.put(name,quantity);
+			else
+			cart.put(name,(int)(cart.get(name))+quantity);
+			session.setAttribute("cart", cart);
+			
+			
+			Set set = cart.entrySet();
+		      // Get an iterator
+		      Iterator i = set.iterator();
+		      // Display elements
+		      while(i.hasNext()) {
+		         Map.Entry me = (Map.Entry)i.next();
+		         System.out.print(me.getKey() + ": ");
+		         System.out.println(me.getValue());
+		      }
 		return "redirect:/items/viewall";
+		
 	}
+	
 	@RequestMapping(value="/items/enable/{id}", method=RequestMethod.POST)
 	public String enableItem(@PathVariable("id") int id) {
 		DatabaseService ds = new DatabaseService();
@@ -233,6 +302,13 @@ System.out.println("PIC ADD = " + picture);
 		mav.addObject("list", menuItems);
 		mav.setViewName("viewitem");
 		return mav;
+	}
+	
+	@RequestMapping(value="/orders/deleteall",method=RequestMethod.DELETE)
+	public String getAllOrders() {
+		DatabaseService database = new DatabaseService();
+		database.deleteOrders();
+		return "redirect:/items/viewall";
 	}
 
 	public DatabaseService getDatabaseService() {
