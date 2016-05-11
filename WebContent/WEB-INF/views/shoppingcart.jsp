@@ -20,10 +20,41 @@
 
 <spring:url value="/resources/assets/css/style.css" var="styleCss" />
 <link href="${styleCss}" rel="stylesheet">
-
+<script>
+$(document).ready(function() {
+$('#checkbox').change(function() {
+	   if($(this).is(":checked")) {
+		   $("#time").removeAttr("disabled");
+		     $("#date").removeAttr("disabled");
+	   }
+	   else {
+		   $("#time").attr("disabled","disabled");
+		     $("#date").attr("disabled","disabled");
+	   }
+	});
+	
+	$("#order").click(function(){
+		$.ajax({
+			type:"post",
+			url:"/cmpe275/items/orderNow",
+			success:function(response) {
+				if (response.success == 'auto order placed' || response.success == 'manual order placed') {
+					console.log(response);
+					alert(response.msg);
+					window.location.href = '/cmpe275/items/viewall';
+				}
+				if (response.success == 'cannot place') {
+					alert(response.msg);
+				}
+			}
+		});
+	});
+});
+</script>
 </head>
 <body>
 <div class="container container-table">
+<c:if test="${not empty cart}">
 <table class="table table-condensed shoppingtable">
   <thead>
     <tr>
@@ -40,13 +71,27 @@
     </c:forEach>
   </tbody>
 </table>
-  <form method="post" action="/cmpe275/items/orderNow">
-  <input type="time" name="usr_time">
-  <input type="date" name="bday" min="2000-01-02">
-       <button class="btn btn-info btn-lg pull-right" role="button"> 
+
+
+
+  <form class="form-signin">
+   <div class="checkbox">
+    <label>
+      <input id="checkbox" type="checkbox"> Pick Manual Time
+    </label>
+  </div>
+  <input class="form-control" id="time" type="time" name="usr_time" disabled>
+  <input class="form-control" id="date" type="date" name="bday" min="2000-01-02" disabled>
+       <button id="order" class="btn btn-lg btn-primary btn-block" type="button"> 
         Order 
        </button>
        </form>
-</div>
+       </c:if>
+       <c:if test="${empty cart}">
+       <form class="form-signin">
+       <p class="paragraph">Please place some orders</p>
+       </form>
+       </c:if>
+       </div>
 </body>
 </html>
