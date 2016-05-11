@@ -53,7 +53,7 @@ public class OrderAlgo {
 		}
 	}
 
-	public static void main(String a[]) {
+	public  void main1(String a[]) {
 		OrderAlgo obj = new OrderAlgo();
 		try {
 
@@ -63,18 +63,44 @@ public class OrderAlgo {
 			boolean orderCreated=false;
 			
 			
-			Time pickupTime2=new Time(21,0,0);
-			int prepTime = 5;
+			Time pickupTime2=new Time(16,0,0);
+			int prepTime = 25;
 			
-			
+			boolean manualInput=true;
 			////////
-			Calendar calendar=Calendar.getInstance();
-			calendar.setTime(pickupTime2);
-			//System.out.println(calendar.getTime());
+			
+			if(manualInput)
+			{
+				boolean result=obj.userProvidedTimeSlot(dop, prepTime, pickupTime2);
+				if(result)
+					System.out.println("order created");
+				else 
+				{
+					Time result2=obj.earliestAvailableTimeSlot(dop, prepTime);
+					if(result2!=null)
+						System.out.println("Order not possible at given time, earliest possible time is "+result2+", please revise the order");
+						else {
+							System.out.println("Order not possible, please revise the Items/Quantities/Pickup time/Date");
+						}
+
+				}
+				
+			}
+			else 
+			{
+				Time result=obj.earliestAvailableTimeSlot(dop, prepTime);
+				if(result!=null)
+				{
+					System.out.println("Order created "+obj.userProvidedTimeSlot(dop, prepTime, result));
+				}else {
+					System.out.println("Order not possible, please revise the Items/Quantities/Pickup time/Date");
+				}
+				
+			}
 				
 			////////
 			
-			System.out.println("earliest pickup time "+obj.earliestAvailableTimeSlot(dop, prepTime));
+			//System.out.println("earliest pickup time "+obj.earliestAvailableTimeSlot(dop, prepTime));
 		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -239,7 +265,7 @@ public class OrderAlgo {
 		int chefId=1;
 		boolean orderCreated=false;
 		Time startTime,endTime;
-		
+		checkEarliestPickupTime=false;
 		
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(pickupTime);
@@ -349,7 +375,7 @@ public class OrderAlgo {
 			// Setup the connection with the DB
 			connect = DriverManager
 					.getConnection("jdbc:mysql://localhost:3306/OrderManagementSystem?"
-							+ "user=root&password=a");
+							+ "user=root&password=admin");
 
 			// Statements allow to issue SQL queries to the database
 			//statement = connect.createStatement();

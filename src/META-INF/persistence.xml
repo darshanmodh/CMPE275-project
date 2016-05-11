@@ -5,6 +5,7 @@
    
       <class>cmpe275.order.model.MenuItem</class>
       <class>cmpe275.order.model.User</class>
+      <class>cmpe275.order.model.OrdersPlaced</class>
       <exclude-unlisted-classes>false</exclude-unlisted-classes> 
 
       <properties>
