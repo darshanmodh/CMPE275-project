@@ -18,6 +18,7 @@ import javax.sql.rowset.serial.SerialException;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,7 +45,7 @@ public class OrderController {
 	boolean sessionFlag;
 	@RequestMapping(value="/",method=RequestMethod.GET)
 	public String getDefault() {
-		return "/registration";
+		return "additem";
 	}
 
 	@RequestMapping(value = "/items/add", method = RequestMethod.GET)
@@ -187,13 +188,12 @@ public class OrderController {
 	
 
 	
-@RequestMapping(value="/items/shoppingCart", method=RequestMethod.POST)
-	
+@RequestMapping(value="/items/shoppingCart", method=RequestMethod.POST)	
 	public String addToShoppingCart(@RequestParam("menuid") int menuid,
 			                        @RequestParam("menuName") String name, 
 			                        @RequestParam("quantity") int quantity,
 			                        @RequestParam("prepTime") int prepTime,
-			                         HttpServletRequest request) 
+			                        HttpServletRequest request) 
 	{
 		// Get HTTPSession from the user 
 
@@ -201,8 +201,6 @@ public class OrderController {
 				if(session.getAttribute("totalPrepTime")!=null)
 		{
 			session.setAttribute("totalPrepTime", (int)session.getAttribute("totalPrepTime")+(prepTime*quantity));
-
-			
 		}
 		else
 			session.setAttribute("totalPrepTime", prepTime*quantity);
@@ -233,14 +231,13 @@ public class OrderController {
 		         System.out.println(me.getValue());
 		      }
 		return "redirect:/items/viewall";
-		
 	}
 	
 	@RequestMapping(value="/items/enable/{id}", method=RequestMethod.POST)
 	public String enableItem(@PathVariable("id") int id) {
 		DatabaseService ds = new DatabaseService();
 		ds.enableItem(id);
-		return "redirect:/items/viewdisabled";
+		return "redirect:/items/viewall";
 	}
 
 	@RequestMapping(value = "/items/viewall", method = RequestMethod.GET)
