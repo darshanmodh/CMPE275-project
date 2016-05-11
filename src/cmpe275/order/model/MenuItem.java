@@ -2,8 +2,12 @@ package cmpe275.order.model;
 
 import java.sql.Blob;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
@@ -14,6 +18,9 @@ public class MenuItem {
 	private int menuId;
 	private String category;
 	private String name;
+	@Lob
+	@Basic(fetch=FetchType.LAZY)
+	@Column(name="picture", columnDefinition="BLOB NOT NULL")
 	private Blob picture;
 	private float unitPrice;
 	private float calories;

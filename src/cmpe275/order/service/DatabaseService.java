@@ -30,7 +30,7 @@ public class DatabaseService {
 	}
 
 	public void addItem(MenuItem menu) throws SQLException {
-		System.out.println("len_add = " + menu.getPicture().length());
+		System.out.println("len_add = " + menu.getPicture());
 		entityManager.getTransaction().begin();
 		entityManager.persist(menu);
 		entityManager.getTransaction().commit();
@@ -46,9 +46,9 @@ public class DatabaseService {
 		entityManagerFactory.close();
 	}
 	
-	public void updatePicture(int itemId, Blob pic) throws SQLException {
-		System.out.println("len = "+pic.length());		
-		Query query = entityManager.createQuery("update MenuItem m SET m.picture='" + pic + "' WHERE m.menuId=:itemId");
+	public void updatePicture(int itemId, MenuItem menu) throws SQLException {
+		//System.out.println("len = "+menu.getPicture().length());		
+		Query query = entityManager.createQuery("update MenuItem m SET m.picture='" + menu.getPicture() + "' WHERE m.menuId=:itemId");
 		query.setParameter("itemId", itemId);		
 		query.executeUpdate();
 	}
@@ -58,7 +58,7 @@ public class DatabaseService {
 		Query query = entityManager.createQuery("update MenuItem m SET m.name='" + menu.getName() + "', m.category='" + menu.getCategory() + "', m.unitPrice='" + menu.getUnitPrice() + "', m.calories='" + menu.getCalories() + "', m.prepTime='" + menu.getPrepTime() + "' WHERE m.menuId=:itemId");	
 		query.setParameter("itemId", itemId);
 		query.executeUpdate();
-		updatePicture(itemId, menu.getPicture());
+		updatePicture(itemId, menu);
 		entityManager.getTransaction().commit();
 		entityManager.close();
 		entityManagerFactory.close();
@@ -89,6 +89,24 @@ public class DatabaseService {
 			menuList.add(mi);
 		}
 		//System.out.println(menuList.get(0).getName());
+		return menuList;
+	}
+	
+	public List<MenuItem> getItemsByCategory(String category) {
+		Query query = entityManager.createQuery("select m.menuId,m.name,m.category,m.unitPrice,m.calories from MenuItem m where m.isEnabled=1 AND m.category=:category");
+		query.setParameter("category", category);
+		@SuppressWarnings("unchecked")
+		List<Object[]> menu =  query.getResultList();
+		List<MenuItem> menuList = new ArrayList<MenuItem>();
+		for (Object[] m: menu) {
+			MenuItem mi = new MenuItem();
+			mi.setMenuId((int) m[0]);
+			mi.setName((String) m[1]);
+			mi.setCategory((String) m[2]);
+			mi.setUnitPrice((float) m[3]);
+			mi.setCalories((float) m[4]);
+			menuList.add(mi);
+		}
 		return menuList;
 	}
 	
