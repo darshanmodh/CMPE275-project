@@ -47,6 +47,16 @@ body {
   border-top-right-radius: 0;
 }
 
+.form-signin input[type="date"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+.form-signin input[type="time"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
 .form-signin input[type="text"] {
   margin-bottom: 10px;
   border-top-left-radius: 0;
@@ -77,6 +87,10 @@ body {
  padding: 10px;
 }
 
+.shoppingtable,.paragraph{
+	font-size:x-large;
+	color:aliceblue;	
+}
 
 html,
 body {

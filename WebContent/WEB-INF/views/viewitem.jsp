@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Bootstrap Example</title>
+<title>Order Management System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <spring:url value="/resources/assets/css/bootstrap.min.css"
 	var="mainCss" />
@@ -33,21 +33,6 @@
 	        });
 	    }
 	 	
-	 $(document).ready(function(){
-		 $("#shoppingcart").click(function(){
-			$.ajax({
-				type: "get",
-				url: '/cmpe275/items/getCartdetails',
-				success: function(response){
-					obj = JSON.parse(response);
-					console.log(obj);
-					$("#modalId").html(obj);
-				}
-			}) ;
-		 });
-		 
-	 });
-	 
 	 
 </script>
 </head>
@@ -61,10 +46,12 @@
 				try {
 					if (session.getAttribute("role").equals('U')) {
 			%>
-			<button id="shoppingcart" type="button" class="btn btn-info btn-lg pull-right" data-toggle="modal" data-target="#ShoppingCartModel">
+			<form method="get" action="/cmpe275/items/getCartdetails">
+			<button type="submit" class="btn btn-info btn-lg pull-right">
 				<span class="glyphicon glyphicon-shopping-cart"></span> Shopping
 				Cart
 			</button>
+			</form>
 			<%
 				} else if (session.getAttribute("role").equals('A')) {
 			%>
@@ -178,23 +165,6 @@
 			</div>
 		</c:forEach>
 	</div>
-<div class="modal fade" id="ShoppingCartModel" role="dialog">
-    <div class="modal-dialog">
-    
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h4 class="modal-title">Shopping Cart </h4>
-        </div>
-        <div id="modalId" class="modal-body">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
-      </div>
-      
-    </div>
-  </div>
+
 </body>
 </html>

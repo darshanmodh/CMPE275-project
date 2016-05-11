@@ -77,7 +77,7 @@ public class DatabaseService {
 	}
 	
 	public List<MenuItem> viewAllItems() {
-		Query query = entityManager.createQuery("select m.menuId,m.name,m.category,m.unitPrice,m.calories from MenuItem m where m.isEnabled=1");
+		Query query = entityManager.createQuery("select m.menuId,m.name,m.category,m.unitPrice,m.calories,m.prepTime from MenuItem m where m.isEnabled=1");
 		@SuppressWarnings("unchecked")
 		List<Object[]> menu =  query.getResultList();
 		List<MenuItem> menuList = new ArrayList<MenuItem>();
@@ -88,6 +88,7 @@ public class DatabaseService {
 			mi.setCategory((String) m[2]);
 			mi.setUnitPrice((float) m[3]);
 			mi.setCalories((float) m[4]);
+			mi.setPrepTime((int)m[5]);
 			menuList.add(mi);
 		}
 		//System.out.println(menuList.get(0).getName());

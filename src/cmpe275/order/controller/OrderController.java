@@ -34,6 +34,7 @@ import java.sql.Date;
 import javax.servlet.http.HttpSession;
 
 import cmpe275.order.model.MenuItem;
+import cmpe275.order.model.ShoppingCart;
 import cmpe275.order.service.DatabaseService;
 import cmpe275.order.service.OrderAlgo;
 
@@ -96,26 +97,33 @@ public class OrderController {
 @SuppressWarnings("unchecked")
 @RequestMapping(value="/items/getCartdetails", method=RequestMethod.GET)
 	
-	public @ResponseBody JsonArray getCartDetails(HttpServletRequest request)
+	public ModelAndView getCartDetails(HttpServletRequest request)
 	{
 		
 		HttpSession session = request.getSession();
 		HashMap<String,Integer> cart = new HashMap<>();
+		ModelAndView mav = new ModelAndView();
+		if (session.getAttribute("cart") != null) {
 		cart = (HashMap<String, Integer>) session.getAttribute("cart");
-		JsonArray arr = new JsonArray();
+		List<ShoppingCart> arr = new ArrayList<ShoppingCart>();
 		for (String key:cart.keySet()) {
-			JsonObject obj = new JsonObject();
-			obj.addProperty("name",key);
-			obj.addProperty("quantity",cart.get(key));
-			arr.add(obj);
+			ShoppingCart s = new ShoppingCart();
+			s.setMenuName(key);
+			s.setQuantity(cart.get(key));
+			arr.add(s);
 			
 		}
-		return arr;
+		
+		mav.addObject("cart",arr);
+		System.out.println(arr.get(0).getMenuName());
+		}
+		mav.setViewName("shoppingcart");
+		return mav;
 	}
 	
 @RequestMapping(value="/items/orderNow", method=RequestMethod.POST)
 	
-	public String orderNow(HttpServletRequest request) 
+	public @ResponseBody JsonObject orderNow(HttpServletRequest request) 
 	  {
 	HttpSession session = request.getSession(false);
 
@@ -131,20 +139,26 @@ public class OrderController {
 	boolean manualInput=false;
 	////////
 	OrderAlgo obj = new OrderAlgo();
-
+	JsonObject jObj = new JsonObject();
 	if(manualInput)
 	{
 		boolean result=obj.userProvidedTimeSlot(dop, (int)session.getAttribute("totalPrepTime"), pickupTime2);
-		if(result)
-			System.out.println("order created");
+		if(result) {
+			jObj.addProperty("success", "manual order placed");
+			jObj.addProperty("msg","order created");
+			session.removeAttribute("cart");
+		}
+			
 		else 
 		{
 			Time result2=obj.earliestAvailableTimeSlot(dop, (int)session.getAttribute("totalPrepTime"));
-			if(result2!=null)
-				System.out.println("Order not possible at given time, earliest possible time is "+result2+", please revise the order");
-				else {
-					System.out.println("Order not possible, please revise the Items/Quantities/Pickup time/Date");
-				}
+			if(result2!=null) {
+				jObj.addProperty("success", "cannot place");
+				jObj.addProperty("msg","Order not possible at given time, earliest possible time is "+result2+", please revise the order");
+			} else {
+				jObj.addProperty("success", "cannot place");
+				jObj.addProperty("msg","Order not possible, please revise the Items/Quantities/Pickup time/Date");
+			}
 
 		}
 		
@@ -154,15 +168,19 @@ public class OrderController {
 		Time result=obj.earliestAvailableTimeSlot(dop, (int)session.getAttribute("totalPrepTime"));
 		if(result!=null)
 		{
+			jObj.addProperty("success","auto order placed");
+			session.removeAttribute("cart");
+			jObj.addProperty("msg", "Order created ");//+obj.userProvidedTimeSlot(dop, (int)session.getAttribute("totalPrepTime"), result));
 			System.out.println("Order created "+obj.userProvidedTimeSlot(dop, (int)session.getAttribute("totalPrepTime"), result));
 		}else {
-			System.out.println("Order not possible, please revise the Items/Quantities/Pickup time/Date");
+			jObj.addProperty("success", "cannot place");
+			jObj.addProperty("msg","Order not possible, please revise the Items/Quantities/Pickup time/Date");
 		}
 		
 	}
 		
-	
-	return "redirect:/items/viewall";
+	System.out.println(jObj);
+	return jObj;
 
 	  }
 	
