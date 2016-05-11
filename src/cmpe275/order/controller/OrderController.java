@@ -34,6 +34,7 @@ import java.sql.Date;
 import javax.servlet.http.HttpSession;
 
 import cmpe275.order.model.MenuItem;
+import cmpe275.order.model.ShoppingCart;
 import cmpe275.order.service.DatabaseService;
 import cmpe275.order.service.OrderAlgo;
 
@@ -98,21 +99,25 @@ System.out.println("PIC ADD = " + picture);
 @SuppressWarnings("unchecked")
 @RequestMapping(value="/items/getCartdetails", method=RequestMethod.GET)
 	
-	public @ResponseBody JsonArray getCartDetails(HttpServletRequest request)
+	public ModelAndView getCartDetails(HttpServletRequest request)
 	{
 		
 		HttpSession session = request.getSession();
 		HashMap<String,Integer> cart = new HashMap<>();
 		cart = (HashMap<String, Integer>) session.getAttribute("cart");
-		JsonArray arr = new JsonArray();
+		List<ShoppingCart> arr = new ArrayList<ShoppingCart>();
 		for (String key:cart.keySet()) {
-			JsonObject obj = new JsonObject();
-			obj.addProperty("name",key);
-			obj.addProperty("quantity",cart.get(key));
-			arr.add(obj);
+			ShoppingCart s = new ShoppingCart();
+			s.setMenuName(key);
+			s.setQuantity(cart.get(key));
+			arr.add(s);
 			
 		}
-		return arr;
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("cart",arr);
+		System.out.println(arr.get(0).getMenuName());
+		mav.setViewName("shoppingcart");
+		return mav;
 	}
 	
 @RequestMapping(value="/items/orderNow", method=RequestMethod.POST)
