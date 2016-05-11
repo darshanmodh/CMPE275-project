@@ -30,8 +30,9 @@
 		<ul class="nav nav-tabs">
 			<li class="active"><a data-toggle="tab" href="#"><%=user%></a></li>
 			<li><a href="/cmpe275/items/viewall">Menu</a></li>
-			<li><a data-toggle="tab" href="#">Add Menu Item</a></li>
-			<li><a data-toggle="tab" href="#">Delete Menu Item</a></li>
+			<li><a href="/cmpe275/">Add Menu Item</a></li>
+			<li><a href="/cmpe275/items/viewall">Enable Menu Item</a></li>
+			<li><a data-toggle="tab" href="#">Order Status</a></li>
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
 	</div>
