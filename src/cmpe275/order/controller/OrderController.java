@@ -68,12 +68,25 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/items/add", method = RequestMethod.POST)
-	public String addItem(@RequestParam("category") String category, @RequestParam("name") String name,
+	public ModelAndView addItem(@RequestParam("category") String category, @RequestParam("name") String name,
 			@RequestParam("picture") String picture, @RequestParam("unitPrice") float unitPrice,
 			@RequestParam("calories") float calories, @RequestParam("prepTime") int prepTime)
 					throws SerialException, SQLException {
 
+		DatabaseService database = new DatabaseService();
+		ModelAndView mav = new ModelAndView();
+		
 		MenuItem menu = new MenuItem();
+		long menuCount=database.getMenuCount();
+		if(menuCount==999)
+		{
+			mav.addObject("msg","Maximum items reached(999)");
+			mav.setViewName("errorPage");
+			return mav;
+		}
+		else 
+			menu.setMenuId((int) (menuCount));
+		
 		menu.setCalories(calories);
 		menu.setCategory(category);
 		menu.setEnabled(true);
@@ -87,10 +100,11 @@ public class OrderController {
 			System.out.println("blob add = " + blob);
 			menu.setPicture(blob);
 		}
-		DatabaseService database = new DatabaseService();
 		database.addItem(menu);
 
-		return "additem";
+		
+		mav.setViewName("additem");
+		return mav;
 	}
 
 	@RequestMapping(value = "/items/delete/{id}", method = RequestMethod.POST)
