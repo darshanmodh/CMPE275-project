@@ -91,7 +91,7 @@ public class UserController {
 			if (isVerified) {
 				HttpSession session = request.getSession();
 				session.setAttribute("user", email);
-				session.setMaxInactiveInterval(30 * 60); // 30min
+				session.setMaxInactiveInterval(1 * 60); // 30min
 				Cookie userName = new Cookie("user", email);
 				userName.setMaxAge(30 * 60);
 				response.addCookie(userName);
@@ -139,7 +139,7 @@ public class UserController {
 			if (isVerified) {
 				model.addAttribute("email", email);
 				model.addAttribute("message", "Your verification is successfully completed.");
-				return "customer";
+				return "registration";//change registration	
 			} else {
 				// error while updating
 				model.addAttribute("message", "Verification failed, please try again.");
@@ -156,6 +156,11 @@ public class UserController {
 	@RequestMapping(value = "/user/logout", method = RequestMethod.GET)
 	public String getLogoutUser(HttpServletRequest request, ModelMap model) {
 		Cookie[] cookies = request.getCookies();
+		HttpSession session = request.getSession(false);
+		System.out.println("session is "+session);
+		if (session == null)
+			return "registration";
+			
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if (cookie.getName().equals("user")) {
@@ -166,7 +171,6 @@ public class UserController {
 			}
 		}
 
-		HttpSession session = request.getSession(false);
 		System.out.println("User session = " + session.getAttribute("user"));
 		if (session != null) {
 			session.invalidate();
