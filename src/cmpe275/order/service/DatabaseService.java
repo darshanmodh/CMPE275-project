@@ -470,4 +470,10 @@ public class DatabaseService {
 		float price = (float) query.getSingleResult();
 		return price;
 	}
+	public long getMenuCount()
+	{
+		Query query = entityManager.createQuery("select count(m) from MenuItem m");
+		return (long) query.getSingleResult();
+		
+	}
 }

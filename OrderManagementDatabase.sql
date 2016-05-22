@@ -10,7 +10,7 @@ CREATE TABLE User (
 );
 
 CREATE TABLE MenuItem (
-    menuId INT PRIMARY KEY AUTO_INCREMENT,
+    menuId INT PRIMARY KEY,
     category VARCHAR(20),
     name VARCHAR(50),
     picture LONGBLOB,
