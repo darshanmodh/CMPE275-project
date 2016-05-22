@@ -45,6 +45,7 @@
      		 </li>
 			<li><a href="/cmpe275/">Add Menu Item</a></li>
 			<li class="active"><a href="/cmpe275/items/showOrders">Order Status</a></li>
+			<li><a href="/cmpe275/orders/popular">Popular</a></li>
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
 </div>
@@ -53,11 +54,11 @@
 			action="/cmpe275/items/getCustomerDetails">
 			<h2 style="color: white">Pick a date range to view orders</h2>
 			<br><label class="form-label">Start Date</label> <input
-				class="form-control" id="startDate" name="startDate" type="date" />
+				class="form-control" id="startDate" name="startDate" type="date" required/>
 			<label class="form-label" >End Date</label> <input
-				class="form-control" name="endDate" id="endDate" type="date" /><br>
+				class="form-control" name="endDate" id="endDate" type="date" required/><br>
 			<br>
-
+			<input type="hidden" name="sortBy" value="orderTime" />
 			<button type="submit" class="btn btn-lg btn-primary btn-block">Show
 				Orders</button>
 		</form>
