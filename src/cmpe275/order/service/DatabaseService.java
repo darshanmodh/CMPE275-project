@@ -3,9 +3,14 @@ package cmpe275.order.service;
 import java.sql.Blob;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -14,8 +19,14 @@ import javax.persistence.Query;
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialException;
 
+import org.eclipse.persistence.jpa.jpql.parser.AbstractExpression;
+import org.eclipse.persistence.jpa.jpql.parser.DateTime;
+
 import cmpe275.order.model.MenuItem;
+import cmpe275.order.model.OrderDetail;
 import cmpe275.order.model.OrdersPlaced;
+import cmpe275.order.model.Popular;
+import cmpe275.order.model.ShoppingCart;
 import cmpe275.order.model.User;
 
 public class DatabaseService {
@@ -236,17 +247,90 @@ public class DatabaseService {
 		return isAdmin;
 	}
 
-	public List getCustomerOrderDetails(Date startDate, Date endDate) {
+	public List getCustomerOrderDetails(Date startDate, Date endDate, int sort) {
 
 		// List<String> resultSet = new ArrayList<String>();
-		Query query = entityManager
-				.createQuery("select op from OrdersPlaced op where op.prepDate between :startDate and :endDate");
+		String str = "";
+		if (sort == 0) {
+			str = "select op from OrdersPlaced op where op.prepDate between :startDate and :endDate";
+		} else if (sort == 1) {
+			str = "select op from OrdersPlaced op where op.prepDate between :startDate and :endDate order by op.orderTime";
+		} else {
+			str = "select op from OrdersPlaced op where op.prepDate between :startDate and :endDate order by op.prepDate, op.startTime ASC";
+		}
+		Query query = entityManager.createQuery(str);
 		query.setParameter("startDate", startDate);
 		query.setParameter("endDate", endDate);
 		Date today;
 		List<OrdersPlaced> resultSet = query.getResultList();
 
 		System.out.println(" Result Set ");
+		List<OrdersPlaced> resultToDisplay = new ArrayList<OrdersPlaced>();
+		for (OrdersPlaced m : resultSet) {
+			Calendar cal = Calendar.getInstance();
+			today = new Date(cal.getTime().getYear(), cal.getTime().getMonth(), cal.getTime().getDate());
+			System.out.println(today.toLocaleString() + " " + m.getPrepDate().toLocaleString());
+
+			System.out.println("orderTime" + m.getOrderTime());
+			if (m.getPrepDate().before(today))
+				m.setStatus("Completed");
+
+			else if (m.getPrepDate().after(today))
+				m.setStatus("Not yet started");
+			else { // today
+					// System.out.println("today");
+				cal.set(Calendar.DAY_OF_MONTH, 1);
+				cal.set(Calendar.MONTH, 0);
+				cal.set(Calendar.YEAR, 1970);
+				// System.out.println(cal.getTime().toLocaleString()+"
+				// "+m.getStartTime().toLocaleString()+"
+				// "+m.getEndTime().toLocaleString());
+				if (cal.getTime().before(m.getStartTime()))
+					m.setStatus("Not yet started");
+				else if (cal.getTime().after(m.getEndTime()))
+					m.setStatus("Completed");
+				else
+					m.setStatus("In Progress");
+
+			}
+			resultToDisplay.add(m);
+		}
+		// for (OrdersPlaced m: resultSet)
+		// {
+		// System.out.println("Printng results "+m.getStatus());
+		// }
+
+		return resultToDisplay;
+	}
+
+	public boolean deleteOrderDetail() {
+		try {
+			entityManager.getTransaction().begin();
+			Query query1 = entityManager.createQuery("DELETE FROM OrderDetail o");
+			query1.executeUpdate();
+			entityManager.getTransaction().commit();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public void deleteOrders() {
+		boolean bool = new DatabaseService().deleteOrderDetail();
+		if (bool) {
+			entityManager.getTransaction().begin();
+			Query query = entityManager.createQuery("Delete from OrdersPlaced op");
+			query.executeUpdate();
+			entityManager.getTransaction().commit();
+		}
+	}
+
+	public List<OrdersPlaced> getMyOrders(String email) {
+		Query query = entityManager.createQuery("Select o from OrdersPlaced o where o.email='" + email + "'");
+		@SuppressWarnings("unchecked")
+		List<OrdersPlaced> resultSet = query.getResultList();
+
+		Date today;
 		List<OrdersPlaced> resultToDisplay = new ArrayList<OrdersPlaced>();
 		for (OrdersPlaced m : resultSet) {
 			Calendar cal = Calendar.getInstance();
@@ -282,13 +366,108 @@ public class DatabaseService {
 		// }
 
 		return resultToDisplay;
+
 	}
 
-	public void deleteOrders() {
+	public int insertOrders(OrdersPlaced order) {
 		entityManager.getTransaction().begin();
-		Query query = entityManager.createQuery("Delete from OrdersPlaced");
-		query.executeUpdate();
+		entityManager.persist(order);
 		entityManager.getTransaction().commit();
+		return order.getOrderId();
+
 	}
 
+	public boolean deleteOrder(int orderId) {
+		entityManager.getTransaction().begin();
+		Query query = entityManager.createQuery("DELETE FROM OrderDetail o where o.foodOrder.orderId=" + orderId + "");
+		query.executeUpdate();
+		OrdersPlaced ordersPlaced = entityManager.find(OrdersPlaced.class, orderId);
+		if (ordersPlaced != null) {
+			entityManager.remove(ordersPlaced);
+		}
+		entityManager.getTransaction().commit();
+		return true;
+	}
+
+	public void get(String email, HashMap cart, int orderId) {
+		System.out.println("orderId" + orderId);
+		Set set = cart.entrySet();
+		// Get an iterator
+		Iterator i = set.iterator();
+		// Display elements
+		while (i.hasNext()) {
+			Map.Entry me = (Map.Entry) i.next();
+			Query query = entityManager
+					.createQuery("Select m.menuId from MenuItem m where m.name='" + me.getKey() + "'");
+			int menuId = (int) query.getSingleResult();
+			OrderDetail orderDetail = new OrderDetail();
+			OrdersPlaced foodOrder = new OrdersPlaced();
+			MenuItem menu = new MenuItem();
+			entityManager.getTransaction().begin();
+			orderDetail.setFoodOrder(foodOrder);
+			orderDetail.setMenuItem(menu);
+			orderDetail.getMenuItem().setMenuId(menuId);
+			orderDetail.getFoodOrder().setOrderId(orderId);
+			orderDetail.setQuantity((int) me.getValue());
+			entityManager.persist(orderDetail);
+			entityManager.getTransaction().commit();
+		}
+
+	}
+
+	public List<ShoppingCart> getOrder(int orderId) {
+		Query query = entityManager.createQuery("select m.name,o.quantity from OrderDetail o "
+				+ "JOIN MenuItem m on o.menuItem.menuId = m.menuId where o.foodOrder.orderId=" + orderId + "");
+		@SuppressWarnings("unchecked")
+		List<Object[]> list = query.getResultList();
+		System.out.println(list.size());
+		List<ShoppingCart> arr = new ArrayList<ShoppingCart>();
+		for (Object[] p : list) {
+			ShoppingCart s = new ShoppingCart();
+			s.setMenuName(p[0].toString());
+			s.setQuantity((int) p[1]);
+			arr.add(s);
+		}
+		return arr;
+	}
+
+	public List<Popular> getPopular(Date startDate, Date endDate) {
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(startDate);
+		cal.set(Calendar.SECOND, 0);
+
+		Calendar cal2 = Calendar.getInstance();
+		cal2.setTime(endDate);
+		cal2.set(Calendar.SECOND, 0);
+		// System.out.println(new java.sql.Timestamp(endDate.getTime()));
+		Query query = entityManager.createQuery("select m.menuId,m.name,m.category,count(m.menuId) from"
+				+ " MenuItem m JOIN OrderDetail od on m.menuId = od.menuItem.menuId "
+				+ "WHERE od.foodOrder.orderId IN (SELECT op.orderId FROM OrdersPlaced op JOIN OrderDetail od on "
+				+ "od.foodOrder.orderId = op.orderId WHERE op.orderTime BETWEEN '"
+				+ new java.sql.Timestamp(startDate.getTime()) + "' AND '" + new java.sql.Timestamp(endDate.getTime())
+				+ "')" + "GROUP BY m.category,m.menuId " + "ORDER BY count(m.menuId) DESC");
+		System.out.println(query);
+
+		@SuppressWarnings("unchecked")
+		List<Object[]> list = query.getResultList();
+
+		List<Popular> popList = new ArrayList<>();
+		for (Object[] p : list) {
+			Popular pop = new Popular();
+			// System.out.println(p[0]+""+p[1]+" "+p[2] );
+			pop.setMenuId((int) p[0]);
+			pop.setName((String) p[1]);
+			pop.setCategory((String) p[2]);
+			pop.setCount((long) p[3]);
+			popList.add(pop);
+		}
+		return popList;
+	}
+
+	public float getPrice(String menuName) {
+		Query query = entityManager.createQuery("select m.unitPrice from MenuItem m where m.name='" + menuName + "'");
+		float price = (float) query.getSingleResult();
+		return price;
+	}
 }

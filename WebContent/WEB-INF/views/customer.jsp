@@ -30,7 +30,7 @@
 		<ul class="nav nav-tabs">
 			<li class="active"><a href="/cmpe275/user/login"><%=user%></a></li>
 			<li><a href="/cmpe275/items/viewall">Menu</a></li>
-			<li><a href="#">Orders</a></li>			
+			<li><a href="/cmpe275/orders">Orders</a></li>			
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
 	</div>

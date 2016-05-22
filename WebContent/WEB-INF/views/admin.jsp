@@ -41,6 +41,7 @@
      		 </li>
 			<li><a href="/cmpe275/">Add Menu Item</a></li>
 			<li><a href="/cmpe275/items/showOrders">Order Status</a></li>
+			<li><a href="/cmpe275/orders/popular">Popular</a></li>
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
 	</div>

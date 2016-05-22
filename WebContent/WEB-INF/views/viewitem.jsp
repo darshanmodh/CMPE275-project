@@ -50,7 +50,7 @@
 			%>
 				<li><a href="/cmpe275/user/login"><%=user%></a></li>
 				<li class="active"><a href="/cmpe275/items/viewall">Menu</a></li>
-				<li><a href="#">Orders</a></li>			
+				<li><a href="/cmpe275/orders">Orders</a></li>			
 				<li><a href="/cmpe275/user/logout">Logout</a></li>
 				<form method="get" action="/cmpe275/items/getCartdetails">
 					<button type="submit" class="btn btn-info btn-lg pull-right">
@@ -72,6 +72,7 @@
      				</li>
 					<li><a href="/cmpe275/">Add Menu Item</a></li>
 					<li><a href="/cmpe275/items/showOrders">Order Status</a></li>
+					<li><a href="/cmpe275/orders/popular">Popular</a></li>
 					<li><a href="/cmpe275/user/logout">Logout</a></li>
 			<form method="POST" action="/cmpe275/orders/deleteall">
 			<input type="hidden" name="_method" value="DELETE">
@@ -125,8 +126,9 @@
        					<input type="hidden" name="menuid" value='${menu.menuId}'>
        					<input id="quantity" name="quantity" class="form-control" type="number"
 							placeholder="Quantity" min="1" max="100" required> 
-						<input type="hidden" id="menuName" name="menuName" value='${menu.name}'>
+						<input type="hidden" id="menuName" name="menuName" value='${menu.name}'>	
 						<input type="hidden" name="prepTime" value='${menu.prepTime}'>
+						<input type="hidden" name="price" value='${menu.unitPrice}'>
 			   			</div>
 			   		</form>
 					<%	

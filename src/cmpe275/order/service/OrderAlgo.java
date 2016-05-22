@@ -7,6 +7,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.util.Calendar;
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import cmpe275.order.model.OrdersPlaced;
 
 public class OrderAlgo {
 	private java.sql.Connection connect = null;
@@ -15,6 +21,16 @@ public class OrderAlgo {
 	private ResultSet resultSet = null;
 	private Time earliestPickupTime;
 	private boolean checkEarliestPickupTime=false;
+	private String email="";
+	private float price;
+	private HashMap cart;
+	
+	public OrderAlgo(HttpSession session) {
+		this.email = (String) session.getAttribute("user");
+		this.price = (float) session.getAttribute("price");
+		this.cart = (HashMap) session.getAttribute("cart");
+		//System.out.println("email"+email);
+	}
 	
 	private void writeResultSet(ResultSet resultSet) throws SQLException {
 		// ResultSet is initially before the first data set
@@ -54,7 +70,7 @@ public class OrderAlgo {
 	}
 
 	public  void main1(String a[]) {
-		OrderAlgo obj = new OrderAlgo();
+		OrderAlgo obj = new OrderAlgo(null);
 		try {
 
 			Date dop = new Date(2016 - 1900, 4, 10);
@@ -191,16 +207,16 @@ public class OrderAlgo {
 		
 		Time earliestPickupTime1=null,earliestPickupTime2=null,earliestPickupTime3=null;
 		
-			if(bookASlot(dop, prepTime, startTime2,endTime2,1))
+			if(bookASlot(dop, prepTime, startTime2,endTime2,1,earliestPickupTime))
 			earliestPickupTime1=earliestPickupTime;
 			System.out.println("earliestPickupTime1 "+earliestPickupTime1);
 			
 			
-			if(bookASlot(dop, prepTime, startTime2,endTime2,2))
+			if(bookASlot(dop, prepTime, startTime2,endTime2,2,earliestPickupTime))
 			 earliestPickupTime2=earliestPickupTime;
 			System.out.println("earliestPickupTime2 "+earliestPickupTime2);
 
-			if(bookASlot(dop, prepTime, startTime2,endTime2,3))
+			if(bookASlot(dop, prepTime, startTime2,endTime2,3,earliestPickupTime))
 			earliestPickupTime3=earliestPickupTime;
 			System.out.println("earliestPickupTime3 "+earliestPickupTime3);
 
@@ -262,6 +278,7 @@ public class OrderAlgo {
 	
 	public boolean userProvidedTimeSlot(Date dop, int prepTime,Time pickupTime)
 	{
+		System.out.println("pickupTime"+pickupTime);
 		int chefId=1;
 		boolean orderCreated=false;
 		Time startTime,endTime;
@@ -357,15 +374,16 @@ public class OrderAlgo {
 		
 		while(chefId<=3 && !orderCreated)
 		{
-			orderCreated=bookASlot(dop, prepTime, startTime,endTime,chefId);
+			orderCreated=bookASlot(dop, prepTime, startTime,endTime,chefId,pickupTime);
 			chefId++;
 		}
 		//System.out.println("order created "+orderCreated);
 		return orderCreated;
 	}
 	
-	public boolean bookASlot(Date dop, int prepTime, Time st, Time et,int chefId) {
+	public boolean bookASlot(Date dop, int prepTime, Time st, Time et,int chefId,Time pickupTime) {
 		int diff = 0;
+		
 		try {
 			System.out.println();
 			System.out.println("inside bookASlot, chefId: "+chefId);
@@ -439,6 +457,8 @@ public class OrderAlgo {
 				 * before first order check
 				 * 
 				 */
+				DatabaseService database = new DatabaseService();
+				OrdersPlaced order = new OrdersPlaced();
 				diff = (int) ((startTime.getTime() - st.getTime()) / 60000); // minutes
 				System.out.println("time before first order " + diff
 						+ " minutes");
@@ -449,21 +469,36 @@ public class OrderAlgo {
 					cal.setTime(st);
 					cal.add(Calendar.MINUTE, prepTime);
 
-					preparedStatement = connect
-							.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime) values (?, ?, ?, ?)");
+					order.setChefId(chefId);
+					order.setEmail(email);
+					order.setEndTime(new java.sql.Time(cal
+							.getTime().getTime()));
+					order.setPickupTime(pickupTime);
+					order.setTotalPrice(price);
+					order.setPrepDate(prepDate);
+					order.setStartTime(st);
+			//		preparedStatement = connect
+			//				.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime,pickupTime,email,totalPrice) values (?, ?, ?, ?,?,?,?)");
 					// "myuser, webpage, datum, summery, COMMENTS from feedback.comments");
 					// Parameters start with 1
-					preparedStatement.setInt(1, chefId);
+					
+					/*preparedStatement.setInt(1, chefId);
 					preparedStatement.setDate(2, prepDate);
 					preparedStatement.setTime(3, st);
 					preparedStatement.setTime(4, new java.sql.Time(cal
 							.getTime().getTime()));
+					preparedStatement.setTime(5,pickupTime);
+					preparedStatement.setString(6,email);
+					preparedStatement.setFloat(7,price); */
 
 					earliestPickupTime=new java.sql.Time(cal
-							.getTime().getTime());
+							.getTime().getTime()); 
 					if(!checkEarliestPickupTime)
 					{
-						preparedStatement.executeUpdate();
+						System.out.println("last-4");
+						int orderId = database.insertOrders(order);
+						database.get(email, cart,orderId);
+						//preparedStatement.executeUpdate();
 					}
 					// System.out.println("Order created");
 					close();
@@ -503,8 +538,8 @@ public class OrderAlgo {
 						cal.setTime(prevEndtime);
 						cal.add(Calendar.MINUTE, prepTime);
 
-						preparedStatement = connect
-								.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime) values (?, ?, ?, ?)");
+						/*preparedStatement = connect
+								.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime,pickupTime,email,totalPrice) values (?, ?, ?, ?,?,?,?)");
 						// "myuser, webpage, datum, summery, COMMENTS from feedback.comments");
 						// Parameters start with 1
 						preparedStatement.setInt(1, chefId);
@@ -512,12 +547,27 @@ public class OrderAlgo {
 						preparedStatement.setTime(3, prevEndtime);
 						preparedStatement.setTime(4, new java.sql.Time(cal
 								.getTime().getTime()));
+						preparedStatement.setTime(5,pickupTime);
+						preparedStatement.setString(6,email);
+						preparedStatement.setFloat(7,price); 
+					//	System.out.println("emial"+email);*/
 
 						earliestPickupTime=new java.sql.Time(cal
 								.getTime().getTime());
+						order.setChefId(chefId);
+						order.setEmail(email);
+						order.setEndTime(new java.sql.Time(cal
+								.getTime().getTime()));
+						order.setPickupTime(pickupTime);
+						order.setTotalPrice(price);
+						order.setPrepDate(prepDate);
+						order.setStartTime(st);
 						if(!checkEarliestPickupTime)
 						{
-						preparedStatement.executeUpdate();
+							System.out.println("last-3");
+							int orderId = database.insertOrders(order);
+							database.get(email, cart,orderId);
+							//preparedStatement.executeUpdate();
 						}
 						// System.out.println("Order created");
 						close();
@@ -542,8 +592,8 @@ public class OrderAlgo {
 					cal.setTime(prevEndtime);
 					cal.add(Calendar.MINUTE, prepTime);
 
-					preparedStatement = connect
-							.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime) values (?, ?, ?, ?)");
+					/*preparedStatement = connect
+							.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime,pickupTime,email,totalPrice) values (?, ?, ?, ?,?,?,?)");
 					// "myuser, webpage, datum, summery, COMMENTS from feedback.comments");
 					// Parameters start with 1
 					preparedStatement.setInt(1, chefId);
@@ -551,12 +601,26 @@ public class OrderAlgo {
 					preparedStatement.setTime(3, prevEndtime);
 					preparedStatement.setTime(4, new java.sql.Time(cal
 							.getTime().getTime()));
+					preparedStatement.setTime(5,pickupTime);
+					preparedStatement.setString(6,email);
 
+					preparedStatement.setFloat(7,price); */
 					earliestPickupTime=new java.sql.Time(cal
 							.getTime().getTime());
+					order.setChefId(chefId);
+					order.setEmail(email);
+					order.setEndTime(new java.sql.Time(cal
+							.getTime().getTime()));
+					order.setPickupTime(pickupTime);
+					order.setTotalPrice(price);
+					order.setPrepDate(prepDate);
+					order.setStartTime(st);
 					if(!checkEarliestPickupTime)
 					{
-						preparedStatement.executeUpdate();
+						System.out.println("last-2");
+						int orderId = database.insertOrders(order);
+						//preparedStatement.executeUpdate();
+						database.get(email, cart,orderId);
 					}// System.out.println("Order created");
 					close();
 					return true;
@@ -568,16 +632,20 @@ public class OrderAlgo {
 			/*
 			 * if order is today and no orders against chef 
 			 */
+			DatabaseService database = new DatabaseService();
+			OrdersPlaced order = new OrdersPlaced();
+		
 			if (isToday(dop)) {
 
 					//test
+				
 					Calendar tempCal = Calendar.getInstance();
 					tempCal.setTime(st);
 					tempCal.add(Calendar.MINUTE, prepTime);
 					//Calendar cal = Calendar.getInstance();
 
-					preparedStatement = connect
-							.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime) values (?, ?, ?, ?)");
+					/*preparedStatement = connect
+							.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime,pickupTime,email,totalPrice) values (?, ?, ?, ?,?,?,?)");
 
 					preparedStatement.setInt(1, chefId);
 					preparedStatement.setDate(2, dop);
@@ -585,12 +653,25 @@ public class OrderAlgo {
 					preparedStatement.setTime(3, st);
 					preparedStatement.setTime(4, new java.sql.Time(tempCal.getTime()
 							.getTime()));
-
+					preparedStatement.setTime(5,pickupTime);
+					preparedStatement.setString(6,email);
+					preparedStatement.setFloat(7,price); */
 					earliestPickupTime=new java.sql.Time(tempCal.getTime()
 							.getTime());
+					order.setChefId(chefId);
+					order.setEmail(email);
+					order.setEndTime(new java.sql.Time(tempCal
+							.getTime().getTime()));
+					order.setPickupTime(pickupTime);
+					order.setTotalPrice(price);
+					order.setPrepDate(dop);
+					order.setStartTime(st);
 					if(!checkEarliestPickupTime)
 					{
-						preparedStatement.executeUpdate();
+						System.out.println("last-1");
+						int orderId= database.insertOrders(order);
+						database.get(email, cart,orderId);
+				//		preparedStatement.executeUpdate();
 					}
 					close();
 					return true;
@@ -607,8 +688,17 @@ public class OrderAlgo {
 			tempCal.setTime(st);
 			tempCal.add(Calendar.MINUTE, prepTime);
 
-			preparedStatement = connect
-					.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime) values (?, ?, ?, ?)");
+			order.setChefId(chefId);
+			order.setEmail(email);
+			order.setEndTime(new java.sql.Time(tempCal
+					.getTime().getTime()));
+			order.setPickupTime(pickupTime);
+			order.setTotalPrice(price);
+			order.setPrepDate(dop);
+			order.setStartTime(st);
+			
+			/*preparedStatement = connect
+					.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime,pickupTime,email,totalPrice) values (?, ?, ?, ?,?,?,?)");
 
 			preparedStatement.setInt(1, chefId);
 			preparedStatement.setDate(2, dop);
@@ -617,11 +707,18 @@ public class OrderAlgo {
 			preparedStatement.setTime(4, new java.sql.Time(tempCal.getTime()
 					.getTime()));
 
+			preparedStatement.setTime(5,pickupTime);
+			preparedStatement.setString(6,email);
+			preparedStatement.setFloat(7,price); */
 			earliestPickupTime=new java.sql.Time(tempCal.getTime()
 					.getTime());
+			
 			if(!checkEarliestPickupTime)
 			{
-				preparedStatement.executeUpdate();
+				int orderId= database.insertOrders(order);
+				System.out.println("last");
+				database.get(email, cart,orderId);
+		//		preparedStatement.executeUpdate();
 			}
 			close();
 			return true;
