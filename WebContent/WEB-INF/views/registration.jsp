@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <!doctype html>
 
 <title>Order Management System</title>
@@ -56,6 +58,18 @@ if (session.getAttribute("user")!=null) {
 					<input id="confirmPassword" name="cpassword" class="form-control" type="password" placeholder="Confirm Password" required>
 					<button type="submit" class="btn btn-lg btn-primary btn-block">Register</button>
 				</form>
+				
+				
+				
+				<c:if test="${message!=null}">
+				<div id="message" class="alert alert-info fade in">
+			<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+			
+								<p>${message}</p>
+						</div>
+				</c:if>
+				
+				
 			</div>
 			<div id="Login" class="tab-pane fade">
 				<form class="form-signin" method="post" action="/cmpe275/user/login">
