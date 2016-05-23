@@ -23,21 +23,26 @@
 
 <script>
 $(document).ready(function() {
-	var today = new Date();
-	var dd = today.getDate();
-	var mm = today.getMonth()+1; //January is 0!
-	var yyyy = today.getFullYear();
-
-	if(dd<10) {
-	    dd='0'+dd
-	} 
-
-	if(mm<10) {
-	    mm='0'+mm
-	} 
-
-	today = mm+'-'+dd+'-'+yyyy;
-    $("#date").attr("min",today);
+	var date= new Date();
+	var month=date.getMonth()+1;
+	var day=date.getDate();
+	if(month<10)
+	month="0"+month;
+	if(day<10)
+	day="0"+day;
+	var today=new Date().getFullYear()+"-"+month+"-"+day;
+	console.log(today);
+	document.getElementsByName("bday")[0].setAttribute('min', today);
+	var newDate = new Date(new Date().setTime( date.getTime() + 30 * 86400000 ));
+	month=newDate.getMonth()+1;
+	day=newDate.getDate();
+	if(month<10)
+	month="0"+month;
+	if(day<10)
+	day="0"+day;
+	newDate=newDate.getFullYear()+"-"+month+"-"+day;
+	console.log(newDate);
+	document.getElementsByName("bday")[0].setAttribute('max', newDate);
 $('#checkbox').change(function() {
 	   if($(this).is(":checked")) {
 		   $("#time").removeAttr("disabled");

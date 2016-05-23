@@ -31,14 +31,17 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.JsonObject;
 
+import cmpe275.order.model.AverageRating;
 import cmpe275.order.model.MenuItem;
 import cmpe275.order.model.OrderDetail;
 import cmpe275.order.model.OrdersPlaced;
 import cmpe275.order.model.Popular;
+import cmpe275.order.model.Rating;
 import cmpe275.order.model.ShoppingCart;
 import cmpe275.order.service.DatabaseService;
 import cmpe275.order.service.JdbcDatabaseService;
 import cmpe275.order.service.OrderAlgo;
+import cmpe275.order.service.SendEmailForOrder;
 
 @Controller
 public class OrderController {
@@ -58,6 +61,7 @@ public class OrderController {
 		ModelAndView mav = new ModelAndView();
 		mav.addObject("myOrders",list);
 		mav.setViewName("myorders");
+		database.close();
 		return mav;
 		
 	}
@@ -68,12 +72,23 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/items/add", method = RequestMethod.POST)
-	public String addItem(@RequestParam("category") String category, @RequestParam("name") String name,
+	public ModelAndView addItem(@RequestParam("category") String category, @RequestParam("name") String name,
 			@RequestParam("picture") String picture, @RequestParam("unitPrice") float unitPrice,
 			@RequestParam("calories") float calories, @RequestParam("prepTime") int prepTime)
 					throws SerialException, SQLException {
 
+		DatabaseService database = new DatabaseService();
+		ModelAndView mav = new ModelAndView();
+		
 		MenuItem menu = new MenuItem();
+		/*long menuCount=database.getMenuCount();
+		if(menuCount==999) {
+			mav.addObject("msg","Maximum items reached(999)");
+			mav.setViewName("errorPage");
+			return mav;
+		} else 
+			menu.setMenuId((int) (menuCount));*/
+		
 		menu.setCalories(calories);
 		menu.setCategory(category);
 		menu.setEnabled(true);
@@ -87,16 +102,25 @@ public class OrderController {
 			System.out.println("blob add = " + blob);
 			menu.setPicture(blob);
 		}
-		DatabaseService database = new DatabaseService();
-		database.addItem(menu);
+		String menuName = database.checkName(name);
+		System.out.println(menuName);
+		if (menuName == null) {
+			database.addItem(menu);
+			mav.addObject("success",true);
+		} else {
+			mav.addObject("success",false);
+		}
 
-		return "additem";
+		mav.setViewName("additem");
+		database.close();
+		return mav;
 	}
 
 	@RequestMapping(value = "/items/delete/{id}", method = RequestMethod.POST)
 	public String deleteItem(@PathVariable("id") int id) {
 		DatabaseService ds = new DatabaseService();
 		ds.deleteItem(id);
+		ds.close();
 		return "redirect:/items/viewall";
 	}
 
@@ -127,6 +151,7 @@ public class OrderController {
 		mav.addObject("startDate",startDate);
 		mav.addObject("endDate",endDate);
 		mav.setViewName("orders");
+		ds.close();
 		return mav;
 
 	}
@@ -200,6 +225,7 @@ public class OrderController {
 			if (result) {
 				jObj.addProperty("success", "manual order placed");
 				jObj.addProperty("msg", "order created");
+				new SendEmailForOrder().sendMail((String)session.getAttribute("user"),"Order Placed Successfully!");
 				session.removeAttribute("cart");
 				session.setAttribute("totalPrepTime", 0);
 				session.removeAttribute("price");
@@ -231,6 +257,8 @@ public class OrderController {
 					(int) session.getAttribute("totalPrepTime"));
 			if (result != null) {
 				jObj.addProperty("success", "auto order placed");
+				new SendEmailForOrder().sendMail((String)session.getAttribute("user"),"Order Placed Successfully!");
+				
 				// System.out.println("total prep time
 				// "+(int)session.getAttribute("totalPrepTime"));
 				System.out
@@ -312,17 +340,30 @@ public class OrderController {
 	public String enableItem(@PathVariable("id") int id) {
 		DatabaseService ds = new DatabaseService();
 		ds.enableItem(id);
+		ds.close();
 		return "redirect:/items/viewall";
 	}
 
 	@RequestMapping(value = "/items/viewall", method = RequestMethod.GET)
-	public ModelAndView viewItems() {
+	public ModelAndView viewItems(HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		DatabaseService database = new DatabaseService();
 		List<MenuItem> menuItems = database.viewAllItems();
+		List<Integer> ratingList = database.isOrderPicked((String)request.getSession().getAttribute("user"));
+		//if (ratingList.size() > )
 		mav.addObject("list", menuItems);
 		mav.addObject("isDisabled", 0);
+		//System.out.println("ratingList"+ratingList);
+		List<Integer> list = new ArrayList<>();
+		for (MenuItem i:menuItems) {
+			 list.add(i.getMenuId());
+		}
+		List<AverageRating> avgRating = database.getAverageRating(list);
+		mav.addObject("ratingMenuId",ratingList);
 		mav.setViewName("viewitem");
+		mav.addObject("avgRating",avgRating);
+		System.out.println("avgRating"+avgRating.get(0).getMenuId());
+		database.close();
 		return mav;
 	}
 
@@ -334,6 +375,7 @@ public class OrderController {
 		mav.addObject("list", menuItems);
 		mav.addObject("isDisabled", 1);
 		mav.setViewName("viewitem");
+		database.close();
 		return mav;
 	}
 
@@ -346,6 +388,7 @@ public class OrderController {
 		menu.setPicture(new SerialBlob(image));
 		mav.addObject("menuItem", menu);
 		mav.setViewName("subView");
+		database.close();
 		return mav;
 	}
 
@@ -354,6 +397,7 @@ public class OrderController {
 			throws SQLException, IOException {
 		DatabaseService database = new DatabaseService();
 		byte[] image = database.getImage(itemId).getBytes(1, (int) database.getImage(itemId).length());
+		database.close();
 		OutputStream outputStream = response.getOutputStream();
 		outputStream.write(image);
 	}
@@ -379,15 +423,18 @@ public class OrderController {
 		DatabaseService database = new DatabaseService();
 		database.updateMenuItem(itemId, menu);
 		// database.updatePicture(itemId, blob);
+		database.close();
 		return "redirect:/items/viewall";
 	}
 
-	@RequestMapping(value = "/items/category/{category}", method = RequestMethod.POST)
+	@RequestMapping(value = "/items/category/{category}", method = RequestMethod.GET)
 	public ModelAndView getItemByCategory(@PathVariable("category") String category) {
 		ModelAndView mav = new ModelAndView();
 		DatabaseService database = new DatabaseService();
 		List<MenuItem> menuItems = database.getItemsByCategory(category);
 		mav.addObject("list", menuItems);
+		mav.addObject("isDisabled", 0);
+		database.close();
 		mav.setViewName("viewitem");
 		return mav;
 	}
@@ -403,6 +450,7 @@ public class OrderController {
 	public String deleteOrder(@PathVariable("orderId") int orderId) {
 		DatabaseService database = new DatabaseService();
 		boolean isDeleted = database.deleteOrder(orderId);
+		database.close();
 		return "redirect:/orders";
 	}
 	
@@ -414,6 +462,7 @@ public class OrderController {
 		List<ShoppingCart> list = database.getOrder(orderId);
 		mav.addObject("orderDetail",list);
 		mav.setViewName("orderdetail");
+		database.close();
 		return mav;
 	}
 	
@@ -474,6 +523,25 @@ public class OrderController {
 		session.removeAttribute("price");
 		session.removeAttribute("totalPrepTime");
 		return "redirect:/items/getCartdetails";
+	}
+	
+	@RequestMapping(value="/items/getMe",method=RequestMethod.GET)
+	public void isOrderPicked(HttpServletRequest request) {
+		
+		String email = (String) request.getSession().getAttribute("user");
+		List<Integer> list = new DatabaseService().isOrderPicked(email);
+		System.out.println(list);
+	}
+	
+	@RequestMapping(value="/items/ratings/{menuId}",method=RequestMethod.POST)
+	public String rateItem(@PathVariable("menuId") int menuId, @RequestParam("rate") int rate,
+							HttpServletRequest request) {
+		
+		String email = (String) request.getSession().getAttribute("user");
+		DatabaseService database = new DatabaseService();
+		database.rateItem(email, menuId, rate);
+		database.close();
+		return "redirect:/items/viewall";
 	}
 	
 	public DatabaseService getDatabaseService() {

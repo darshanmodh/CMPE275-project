@@ -477,6 +477,7 @@ public class OrderAlgo {
 					order.setTotalPrice(price);
 					order.setPrepDate(prepDate);
 					order.setStartTime(st);
+					order.setPickUpDate(dop);
 			//		preparedStatement = connect
 			//				.prepareStatement("insert into  OrderManagementSystem.OrdersPlaced (chefId,prepDate,startTime,endTime,pickupTime,email,totalPrice) values (?, ?, ?, ?,?,?,?)");
 					// "myuser, webpage, datum, summery, COMMENTS from feedback.comments");
@@ -562,6 +563,7 @@ public class OrderAlgo {
 						order.setTotalPrice(price);
 						order.setPrepDate(prepDate);
 						order.setStartTime(st);
+						order.setPickUpDate(dop);
 						if(!checkEarliestPickupTime)
 						{
 							System.out.println("last-3");
@@ -615,6 +617,7 @@ public class OrderAlgo {
 					order.setTotalPrice(price);
 					order.setPrepDate(prepDate);
 					order.setStartTime(st);
+					order.setPickUpDate(dop);
 					if(!checkEarliestPickupTime)
 					{
 						System.out.println("last-2");
@@ -666,6 +669,7 @@ public class OrderAlgo {
 					order.setTotalPrice(price);
 					order.setPrepDate(dop);
 					order.setStartTime(st);
+					order.setPickUpDate(dop);
 					if(!checkEarliestPickupTime)
 					{
 						System.out.println("last-1");
@@ -710,6 +714,7 @@ public class OrderAlgo {
 			preparedStatement.setTime(5,pickupTime);
 			preparedStatement.setString(6,email);
 			preparedStatement.setFloat(7,price); */
+			order.setPickUpDate(dop);
 			earliestPickupTime=new java.sql.Time(tempCal.getTime()
 					.getTime());
 			

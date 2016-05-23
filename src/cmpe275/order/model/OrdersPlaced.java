@@ -19,6 +19,7 @@ public class OrdersPlaced {
 	private int orderId;
 	private int chefId;
 	private Date prepDate;
+	private Date pickUpDate;
 	public String getStatus() {
 		return status;
 	}
@@ -86,6 +87,12 @@ public class OrdersPlaced {
 	}
 	public void setOrderTime(Timestamp orderTime) {
 		this.orderTime = orderTime;
+	}
+	public Date getPickUpDate() {
+		return pickUpDate;
+	}
+	public void setPickUpDate(Date pickUpDate) {
+		this.pickUpDate = pickUpDate;
 	}
 	
 }

@@ -7,8 +7,7 @@ body {
   padding-top: 40px;
   padding-bottom: 40px;
   padding-right: 10px;
-  background-image: url('../images/loginBackground.jpg');
-  background-repeat:no-repeat;
+  background-color: black;
 }
 
 .form-signin {

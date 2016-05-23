@@ -29,9 +29,9 @@
 	%>
 	<div class="container" style="color: white;">
 		<ul class="nav nav-tabs">
-			<li class="active"><a href="/cmpe275/user/login"><%=user%></a></li>
+			<li><a href="/cmpe275/user/login"><%=user%></a></li>
 			<li><a href="/cmpe275/items/viewall">Menu</a></li>
-			<li><a href="/cmpe275/orders">Orders</a></li>
+			<li class="active"><a href="/cmpe275/orders">Orders</a></li>
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
 		<h2>Orders</h2>
@@ -41,6 +41,7 @@
 					<th>Order Id</th>
 					<th>Preparation Date</th>
 					<th>Order Time</th>
+					<th>Pick Up Date</th>
 					<th>Pick Up Time</th>
 					<th>Status</th>
 					<th>Contents</th>
@@ -54,7 +55,8 @@
 						<td>${orders.orderId}</td>
 						<td>${orders.prepDate}</td>
 						<td>${orders.orderTime}</td>
-						<td>${orders.pickupTime }</td>
+						<td>${orders.pickUpDate}</td>
+						<td>${orders.pickupTime}</td>
 						<td>${orders.status}</td>
 						<td><a href="/cmpe275/orders/${orders.orderId}"
 							target="_blank" class="btn btn-primary btn-sm" role="button">View</a></td>

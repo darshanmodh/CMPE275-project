@@ -67,6 +67,7 @@
         <th>Order Time</th>
 		<th>Start Time</th>
 		<th>Ready Time</th>
+		<th>Pick Up Date</th>
 		<th>Pick Up Time</th>
 		<th>Status</th>
 		<th>Customer Email</th>
@@ -83,6 +84,7 @@
         <td>${orders.orderTime}</td>
         <td>${orders.startTime}</td>
         <td>${orders.endTime}</td>
+        <td>${orders.pickUpDate}</td>
         <td>${orders.pickupTime }</td>
         <td>${orders.status}</td>
         <td>${orders.email}</td>
