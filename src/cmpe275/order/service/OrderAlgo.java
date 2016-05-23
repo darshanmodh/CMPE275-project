@@ -564,6 +564,7 @@ public class OrderAlgo {
 						order.setPrepDate(prepDate);
 						order.setStartTime(st);
 						order.setPickUpDate(dop);
+						//order.setOrderTime(new Timestamp(new java.util.Date().getTime()));
 						if(!checkEarliestPickupTime)
 						{
 							System.out.println("last-3");

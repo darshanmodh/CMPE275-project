@@ -117,10 +117,15 @@ function readURL(input) {
 			<button type="submit" class="btn btn-lg btn-primary btn-block">Add
 				Item</button>
 				<input type="hidden" id="divId" name="picture">
-		<c:set var="success" value="${success}" />
-		<c:if test="${success ne true}">
-		<p class="form-label">Please enter a different Name.</p>
-		</c:if>
+		
+				<c:if test="${success!=null}">
+				<div id="message" class="alert alert-info fade in">
+			<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+			
+								<p>${success}</p>
+						</div>
+				</c:if>
+				
 		</form>
 	</div>
 

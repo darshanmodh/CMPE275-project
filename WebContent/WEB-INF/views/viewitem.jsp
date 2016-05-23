@@ -181,7 +181,7 @@
 							action="/cmpe275/items/delete/${menu.menuId}">
 							<input type="hidden" class="btn">
 							<button class="btn btn-danger" role="button">
-								<span class="glyphicon glyphicon-trash"></span> Remove
+								<span class="glyphicon glyphicon-trash"></span> Disable
 							</button>
 						</form>
 						<button class="btn btn-warning" role="button" data-toggle="modal"

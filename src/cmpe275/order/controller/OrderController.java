@@ -108,9 +108,8 @@ public class OrderController {
 		System.out.println(menuName);
 		if (menuName == null) {
 			database.addItem(menu);
-			mav.addObject("success",true);
 		} else {
-			mav.addObject("success",false);
+			mav.addObject("success","Name cannot be same");
 		}
 
 		mav.setViewName("additem");
@@ -370,13 +369,23 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/items/viewdisabled", method = RequestMethod.GET)
-	public ModelAndView viewDisabledItems() {
+	public ModelAndView viewDisabledItems(HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		DatabaseService database = new DatabaseService();
 		List<MenuItem> menuItems = database.viewDisabledItems();
 		mav.addObject("list", menuItems);
 		mav.addObject("isDisabled", 1);
+		List<Integer> ratingList = database.isOrderPicked((String)request.getSession().getAttribute("user"));
+		
+		List<Integer> list = new ArrayList<>();
+		for (MenuItem i:menuItems) {
+			 list.add(i.getMenuId());
+		}
+		List<AverageRating> avgRating = database.getAverageRating(list);
+		mav.addObject("ratingMenuId",ratingList);
 		mav.setViewName("viewitem");
+		mav.addObject("avgRating",avgRating);
+		
 		database.close();
 		return mav;
 	}

@@ -60,8 +60,6 @@ public class DatabaseService {
 		Query query = entityManager.createQuery("update MenuItem m set m.isEnabled=0 where m.menuId=" + id + "");
 		query.executeUpdate();
 		entityManager.getTransaction().commit();
-		entityManager.close();
-		entityManagerFactory.close();
 	}
 
 	public void updatePicture(int itemId, MenuItem menu) throws SQLException {
@@ -91,8 +89,6 @@ public class DatabaseService {
 		Query query = entityManager.createQuery("update MenuItem m set m.isEnabled=1 where m.menuId=" + id + "");
 		query.executeUpdate();
 		entityManager.getTransaction().commit();
-		entityManager.close();
-		entityManagerFactory.close();
 	}
 
 	public List<MenuItem> viewAllItems() {
@@ -389,6 +385,7 @@ public class DatabaseService {
 
 	public int insertOrders(OrdersPlaced order) {
 		entityManager.getTransaction().begin();
+		order.setOrderTime(new Timestamp(new java.util.Date().getTime()));
 		entityManager.persist(order);
 		entityManager.getTransaction().commit();
 		System.out.println(order.getOrderId());
