@@ -10,7 +10,7 @@ CREATE TABLE User (
 );
 
 CREATE TABLE MenuItem (
-    menuId INT PRIMARY KEY,
+    menuId INT PRIMARY KEY AUTO_INCREMENT,
     category VARCHAR(20),
     name VARCHAR(50),
     picture LONGBLOB,
@@ -20,17 +20,31 @@ CREATE TABLE MenuItem (
     isEnabled BOOL
 );
 
-CREATE TABLE FoodOrder (
-    orderId INT PRIMARY KEY,
-    email VARCHAR(50),
-    pickupTime TIMESTAMP,
-    status CHAR,
-    totalTime INT,
-    totalCost FLOAT,
-    FOREIGN KEY (email)
-        REFERENCES User (email)
+CREATE TABLE OrdersPlaced (
+  orderId int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  chefId int(11) NOT NULL,
+  prepDate date NOT NULL,
+  startTime time NOT NULL,
+  endTime time DEFAULT NULL,
+  pickupTime time DEFAULT NULL,
+  pickupDate date NOT NULL,
+  orderTime timestamp DEFAULT CURRENT_TIMESTAMP,
+  email VARCHAR(50) REFERENCES User(email),
+  totalPrice FLOAT,
+  status varchar(20)
 );
-                        
+
+CREATE table Rating (
+	menuId int,
+    email varchar(50),
+    rate int,
+    total int,
+    Primary key (menuId,email),
+    Foreign key (menuId) references MenuItem(menuId),
+    foreign key (email) references User(email)
+    
+);
+
 CREATE TABLE OrderDetail (
     menuId INT,
     orderId INT,
@@ -39,31 +53,8 @@ CREATE TABLE OrderDetail (
     FOREIGN KEY (menuId)
         REFERENCES MenuItem (menuId),
     FOREIGN KEY (orderId)
-        REFERENCES FoodOrder (orderId)
+        REFERENCES OrdersPlaced (orderId)
 );
 
-
-CREATE TABLE OrdersPlaced (
-  orderId int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  chefId int(11) NOT NULL,
-  prepDate date NOT NULL,
-  startTime time NOT NULL,
-  endTime time DEFAULT NULL,
-  email VARCHAR(50),
-  contents VARCHAR(200),
-  totalPrice FLOAT
-);
-
-delimiter //
-CREATE TRIGGER check_trigger
-  BEFORE INSERT
-  ON MenuItem
-  FOR EACH ROW
-BEGIN
-
-  IF NEW.menuId <0 or New.menuId>999  THEN
-	signal sqlstate '45000' set message_text = 'My Error Message';
-	END IF;
-END//
 insert into User values('admin@admin.com','admin','A','0000',true);
-					
+		
