@@ -48,19 +48,19 @@
 <table class="table table-inverse shoppingtable">
   <thead>
     <tr>
-      <th style="color:white">Id</th>
-      <th style="color:white">Name</th>
-       <th style="color:white">Category</th>
-      <th style="color:white">Count</th>
+      <th style="color:black">Id</th>
+      <th style="color:black">Name</th>
+       <th style="color:black">Category</th>
+      <th style="color:black">Count</th>
     </tr>
   </thead>
   <tbody>
   <c:forEach items="${popular}" var="menu">
    <tr >
-      <td style="color:white">${menu.menuId}</td>
-      <td style="color:white">${menu.name}</td>
-      <td style="color:white">${menu.category}</td>
-      <td style="color:white">${menu.count}</td>
+      <td style="color:black">${menu.menuId}</td>
+      <td style="color:black">${menu.name}</td>
+      <td style="color:black">${menu.category}</td>
+      <td style="color:black">${menu.count}</td>
    </tr>
    </c:forEach>
 </tbody>

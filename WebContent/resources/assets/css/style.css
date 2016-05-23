@@ -7,7 +7,7 @@ body {
   padding-top: 40px;
   padding-bottom: 40px;
   padding-right: 10px;
-  background-color: black;
+  background-color: white;
 }
 
 .form-signin {
@@ -97,4 +97,8 @@ body {
   padding: 0;
   height: 100%;
   width:100
+}
+
+table {
+	color:black;
 }

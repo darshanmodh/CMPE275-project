@@ -123,17 +123,17 @@ $('#checkbox').change(function() {
 <table class="table table-inverse shoppingtable">
   <thead>
     <tr>
-      <th style="color:white">Item</th>
-      <th style="color:white">Quantity</th>
-      <th style="color:white">Edit</th>
-      <th style="color:white">Delete</th>
+      <th style="color:black">Item</th>
+      <th style="color:black">Quantity</th>
+      <th style="color:black">Edit</th>
+      <th style="color:black">Delete</th>
     </tr>
   </thead>
   <tbody>
     <c:forEach items="${cart}" var="menu">
     <tr >
-      <td style="color:white">${menu.menuName}</td>
-      <td style="color:white">${menu.quantity}</td>
+      <td style="color:black">${menu.menuName}</td>
+      <td style="color:black">${menu.quantity}</td>
       <td><p data-placement="top" data-toggle="tooltip" title="Edit">
       <button class="btn btn-primary btn-xs" data-title="Edit" data-toggle="modal" data-target="#edit" data-menuname="${menu.menuName}" data-quantity="${menu.quantity }" data-href="/cmpe275/items/cart"><span class="glyphicon glyphicon-pencil"></span></button></p></td>
     <td><p data-placement="top" data-toggle="tooltip" title="Delete"><button class="btn btn-danger btn-xs" data-href="/cmpe275/items/cart/${menu.menuName }" data-toggle="modal" data-target="#delete"  ><span class="glyphicon glyphicon-trash"></span></button></p></td>
@@ -146,7 +146,7 @@ $('#checkbox').change(function() {
 
 
   <form class="form-signin">
-   <div class="checkbox" style="color:white">
+   <div class="checkbox" style="color:black">
     <label>
       <input id="checkbox" type="checkbox" > Pick Manual Time
     </label>
@@ -166,7 +166,7 @@ $('#checkbox').change(function() {
        </c:if>
        <c:if test="${empty cart}">
        <form class="form-signin">
-       <p class="paragraph" style="color:white">Please place some orders</p>
+       <p class="paragraph" style="color:black">Please place some orders</p>
        </form>
        </c:if>
        </div>

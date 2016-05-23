@@ -52,7 +52,7 @@
 	<div class="container">
 		<form class="form-signin" method="get"
 			action="/cmpe275/items/getCustomerDetails">
-			<h2 style="color: white">Pick a date range to view orders</h2>
+			<h2 style="color: black">Pick a date range to view orders</h2>
 			<br><label class="form-label">Start Date</label> <input
 				class="form-control" id="startDate" name="startDate" type="date" required/>
 			<label class="form-label" >End Date</label> <input

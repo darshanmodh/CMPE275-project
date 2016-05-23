@@ -48,7 +48,7 @@
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
 </div>
-<div class="container" style="color: white;">
+<div class="container" style="color: black;">
   <h2>Orders</h2>
   <div class="dropdown pull-right">
     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Sort Results

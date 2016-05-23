@@ -26,15 +26,15 @@
 <table class="table table-inverse shoppingtable">
   <thead>
     <tr>
-      <th style="color:white">Item</th>
-      <th style="color:white">Quantity</th>
+      <th style="color:black">Item</th>
+      <th style="color:black">Quantity</th>
     </tr>
   </thead>
   <tbody>
   <c:forEach items="${orderDetail}" var="menu">
    <tr >
-      <td style="color:white">${menu.menuName}</td>
-      <td style="color:white">${menu.quantity}</td>
+      <td style="color:black">${menu.menuName}</td>
+      <td style="color:black">${menu.quantity}</td>
    </tr>
    </c:forEach>
 </tbody>

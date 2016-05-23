@@ -6,8 +6,7 @@
 body {
   padding-bottom: 40px;
   padding-right: 10px;
-  background-image: url('../images/loginBackground.jpg');
-  background-repeat:no-repeat;
+  background-color: white;
 }
 
 .form-signin {
@@ -43,7 +42,6 @@ body {
   height: auto;
   padding: 10px;
   font-size: 19px;
-  color: white;
   font-style: bold;
     font-family: 'Open Sans', sans-serif;
 
