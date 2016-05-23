@@ -2,6 +2,7 @@ package cmpe275.order.model;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table
+@Table(name="OrdersPlaced")
 public class OrdersPlaced {
 
 	
@@ -18,6 +19,7 @@ public class OrdersPlaced {
 	private int orderId;
 	private int chefId;
 	private Date prepDate;
+	private Date pickUpDate;
 	public String getStatus() {
 		return status;
 	}
@@ -27,7 +29,8 @@ public class OrdersPlaced {
 	private Time startTime;
 	private Time endTime;
 	private String email;
-	private String contents;
+	private Time pickupTime;
+	private Timestamp orderTime;
 	private float totalPrice;
 	private String status;
 	public int getOrderId() {
@@ -66,17 +69,30 @@ public class OrdersPlaced {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getContents() {
-		return contents;
-	}
-	public void setContents(String contents) {
-		this.contents = contents;
-	}
+	
 	public float getTotalPrice() {
 		return totalPrice;
 	}
 	public void setTotalPrice(float totalPrice) {
 		this.totalPrice = totalPrice;
+	}
+	public Time getPickupTime() {
+		return pickupTime;
+	}
+	public void setPickupTime(Time pickupTime) {
+		this.pickupTime = pickupTime;
+	}
+	public Timestamp getOrderTime() {
+		return orderTime;
+	}
+	public void setOrderTime(Timestamp orderTime) {
+		this.orderTime = orderTime;
+	}
+	public Date getPickUpDate() {
+		return pickUpDate;
+	}
+	public void setPickUpDate(Date pickUpDate) {
+		this.pickUpDate = pickUpDate;
 	}
 	
 }

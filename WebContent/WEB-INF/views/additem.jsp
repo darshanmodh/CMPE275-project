@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+    pageEncoding="ISO-8859-1"%>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <!DOCTYPE HTML>
 <html>
 <title>Order Management System</title>
@@ -82,6 +84,7 @@ function readURL(input) {
      		 </li>
 			<li class="active"><a href="/cmpe275/">Add Menu Item</a></li>
 			<li><a href="/cmpe275/items/showOrders">Order Status</a></li>
+			<li><a href="/cmpe275/orders/popular">Popular</a></li>
 			<li><a href="/cmpe275/user/logout">Logout</a></li>
 		</ul>
 	</div>
@@ -114,6 +117,10 @@ function readURL(input) {
 			<button type="submit" class="btn btn-lg btn-primary btn-block">Add
 				Item</button>
 				<input type="hidden" id="divId" name="picture">
+		<c:set var="success" value="${success}" />
+		<c:if test="${success ne true}">
+		<p class="form-label">Please enter a different Name.</p>
+		</c:if>
 		</form>
 	</div>
 

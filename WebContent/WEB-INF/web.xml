@@ -29,5 +29,15 @@
     <servlet-name>OrderWeb</servlet-name>
 </filter-mapping>
 
+<jsp-config>
+       <taglib>
+         <taglib-uri>
+          http://myfn
+         </taglib-uri>
+         <taglib-location>
+           /WEB-INF/custom-functions.tld
+         </taglib-location>
+       </taglib> 
+       </jsp-config>
  
 </web-app>
