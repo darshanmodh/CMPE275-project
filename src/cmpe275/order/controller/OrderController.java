@@ -81,6 +81,7 @@ public class OrderController {
 		ModelAndView mav = new ModelAndView();
 		
 		MenuItem menu = new MenuItem();
+
 		/*long menuCount=database.getMenuCount();
 		if(menuCount==999) {
 			mav.addObject("msg","Maximum items reached(999)");
@@ -88,6 +89,7 @@ public class OrderController {
 			return mav;
 		} else 
 			menu.setMenuId((int) (menuCount));*/
+
 		
 		menu.setCalories(calories);
 		menu.setCategory(category);
