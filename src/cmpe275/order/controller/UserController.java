@@ -91,11 +91,11 @@ public class UserController {
 			if (isVerified) {
 				HttpSession session = request.getSession();
 				session.setAttribute("user", email);
-				session.setMaxInactiveInterval(1 * 60); // 30min
+				session.setMaxInactiveInterval(30 * 60); // 30min
 				Cookie userName = new Cookie("user", email);
 				userName.setMaxAge(30 * 60);
 				response.addCookie(userName);
-				// check admin or customer
+				// check admin or customer1
 				char isAdmin = '\0';
 				isAdmin = databaseService.isAdmin(email);
 				if (isAdmin == 'A') {

@@ -364,7 +364,7 @@ public class OrderController {
 		mav.addObject("ratingMenuId",ratingList);
 		mav.setViewName("viewitem");
 		mav.addObject("avgRating",avgRating);
-		System.out.println("avgRating"+avgRating.get(0).getMenuId());
+		//System.out.println("avgRating"+avgRating.get(0).getMenuId());
 		database.close();
 		return mav;
 	}
@@ -430,14 +430,25 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/items/category/{category}", method = RequestMethod.GET)
-	public ModelAndView getItemByCategory(@PathVariable("category") String category) {
+	public ModelAndView getItemByCategory(@PathVariable("category") String category,HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView();
 		DatabaseService database = new DatabaseService();
 		List<MenuItem> menuItems = database.getItemsByCategory(category);
+		
+		List<Integer> ratingList = database.isOrderPicked((String)request.getSession().getAttribute("user"));
+		List<Integer> list = new ArrayList<>();
+		for (MenuItem i:menuItems) {
+			 list.add(i.getMenuId());
+		}
+		List<AverageRating> avgRating = database.getAverageRating(list);
 		mav.addObject("list", menuItems);
 		mav.addObject("isDisabled", 0);
-		database.close();
+		mav.addObject("ratingMenuId",ratingList);
+		mav.addObject("avgRating",avgRating);
 		mav.setViewName("viewitem");
+	
+		//System.out.println("avgRating"+avgRating.get(0).getMenuId());
+		database.close();
 		return mav;
 	}
 

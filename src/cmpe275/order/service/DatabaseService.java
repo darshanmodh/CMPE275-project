@@ -518,24 +518,58 @@ public class DatabaseService {
 		List<Integer> list = new ArrayList<>();
 		List<Integer> finalList = new ArrayList<>();
 		list = query.getResultList();
-		System.out.println(list);
+		System.out.println("list"+list);
 		try {
 			if (list.size() > 0) {
 				for (int i : list) {
-					query = entityManager.createQuery("select r from Rating r where r.menuItem.menuId=" + i
-							+ " and r.user.email='" + email + "'");
-					@SuppressWarnings("unchecked")
-					List<Rating> ratingList = query.getResultList();
-					if (ratingList.size() > 0) {
-						int occurrences = Collections.frequency(list, i);
-						if (occurrences > ratingList.get(0).getTotal()) {
+					Connection connect = null;
+					Statement stmt = null;
+					try {
+						Class.forName("com.mysql.jdbc.Driver");
+					} catch (ClassNotFoundException e3) {
+						// TODO Auto-generated catch block
+						e3.printStackTrace();
+					}
+					// Setup the connection with the DB
+					try {
+						connect = DriverManager
+								.getConnection("jdbc:mysql://localhost:3306/OrderManagementSystem?"
+										+ "user=root&password=admin");
+						stmt = connect.createStatement();
+						
+					} catch (SQLException e2) {
+						e2.printStackTrace();
+					}
+					String sql1 = "Select r.total from Rating r where r.menuId="+i+""
+					+ " AND r.email='"+email+"'";
+					ResultSet rs;
+					boolean isPresent = false;
+					int total = 0;
+					
+					try {
+						rs = stmt.executeQuery(sql1);
+						if (!rs.next()) {
 							if (!finalList.contains(i))
 								finalList.add(i);
 						}
-					} else {
-						if (!finalList.contains(i))
-							finalList.add(i);
+						rs.beforeFirst();
+						while (rs.next()) {
+								int occurrences = Collections.frequency(list, i);
+								System.out.println("occurrences"+occurrences);
+								System.out.println("rating"+rs.getInt("total"));
+								if (occurrences > rs.getInt("total")) {
+									if (!finalList.contains(i))
+										finalList.add(i);
+								}
+						}
+						
+						rs.close();
+					} catch (SQLException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+						connect.close();
 					}
+					
 				}
 			}
 		} catch (Exception e) {
