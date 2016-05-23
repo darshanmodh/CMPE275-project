@@ -81,8 +81,8 @@ public class DatabaseService {
 		query.executeUpdate();
 		// updatePicture(itemId, menu);
 		entityManager.getTransaction().commit();
-		entityManager.close();
-		entityManagerFactory.close();
+		//entityManager.close();
+		//entityManagerFactory.close();
 	}
 
 	public void enableItem(int id) {

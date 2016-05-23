@@ -136,9 +136,6 @@ function readURL(input) {
 		<div class="form-group">
 			<label class="col-sm-2 control-label" for="calories">Picture</label>
 			<div class="col-sm-10">
-				<input id="inputFileToLoad" type="file"
-					accept="image/*" class="buttonSpace" style="margin-bottom: 5px"
-					onchange="readURL(this);" value="/cmpe275/items/${menuItem.menuId}/picture" /> 
 				<img name="picture" id="picture" height="200"
 					width="200" src="/cmpe275/items/${menuItem.menuId}/picture"
 					alt="your image" />
